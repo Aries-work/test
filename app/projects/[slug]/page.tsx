@@ -1,6 +1,6 @@
 import { fetchPortfolioData } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Building2, Calendar, Briefcase, Tag, Target, Zap, TrendingUp, Award, Mail } from 'lucide-react';
+import { ArrowLeft, Building2, Calendar, Crosshair, ListChecks, Zap, TrendingUp, Award } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { CTASection } from '@/components/cta-section';
 import { Footer } from '@/components/footer';
@@ -80,7 +80,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </h1>
 
             <p className="text-lg text-muted-foreground">
-              {project.industry} | {project.role}
+              {project.company} | {project.duration}
             </p>
           </div>
 
@@ -90,24 +90,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           </p>
 
           {/* Metadata grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-12 p-6 rounded-xl border border-border/40 bg-card/50">
+          <div className="grid grid-cols-2 gap-6 mb-12 p-6 rounded-xl border border-border/40 bg-card/50">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
                 Company
               </p>
               <p className="text-sm font-medium">{project.company}</p>
-            </div>
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
-                Industry
-              </p>
-              <p className="text-sm font-medium">{project.industry}</p>
-            </div>
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
-                Role
-              </p>
-              <p className="text-sm font-medium">{project.role}</p>
             </div>
             <div>
               <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
@@ -126,16 +114,38 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             />
           </div>
 
-          {/* Objective */}
+          {/* Situation */}
           <section className="mb-16">
             <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-4">
-              <Target className="w-4 h-4" />
-              Objective
+              <Crosshair className="w-4 h-4" />
+              Situation
             </div>
             <p className="text-base leading-[1.8] text-foreground/80 max-w-2xl">
-              {project.objective}
+              {project.situation}
             </p>
           </section>
+
+          {/* Task */}
+          <section className="mb-16">
+            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-4">
+              <ListChecks className="w-4 h-4" />
+              Task
+            </div>
+            <p className="text-base leading-[1.8] text-foreground/80 max-w-2xl">
+              {project.task}
+            </p>
+          </section>
+
+          {/* img1 */}
+          {project.img1 && (
+            <div className="rounded-xl overflow-hidden mb-16 border border-border/30">
+              <img
+                src={project.img1}
+                alt={`${project.project_name} - 1`}
+                className="w-full h-64 sm:h-80 object-cover"
+              />
+            </div>
+          )}
 
           {/* Roles & Deliverables / Actions */}
           <section className="mb-16">
@@ -167,6 +177,17 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </div>
           </section>
 
+          {/* img2 */}
+          {project.img2 && (
+            <div className="rounded-xl overflow-hidden mb-16 border border-border/30">
+              <img
+                src={project.img2}
+                alt={`${project.project_name} - 2`}
+                className="w-full h-64 sm:h-80 object-cover"
+              />
+            </div>
+          )}
+
           {/* Result */}
           <section className="mb-16">
             <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-4">
@@ -177,15 +198,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               {project.result}
             </p>
           </section>
-
-          {/* Additional image */}
-          <div className="rounded-xl overflow-hidden mb-16 border border-border/30">
-            <img
-              src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1200&h=600&fit=crop"
-              alt={`${project.project_name} result`}
-              className="w-full h-64 sm:h-80 object-cover"
-            />
-          </div>
         </div>
       </main>
 

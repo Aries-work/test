@@ -1,5 +1,6 @@
 import { ArrowDown, Mail, Linkedin } from 'lucide-react';
 import { ProfileStatic } from '@/lib/types';
+import { parseBracketText } from '@/lib/utils';
 
 interface HeroProps {
   profile: ProfileStatic;
@@ -44,7 +45,13 @@ export function Hero({ profile }: HeroProps) {
 
             {/* Headline */}
             <p className="text-xl sm:text-2xl md:text-3xl font-light leading-relaxed text-foreground/80 max-w-xl animate-fade-in-up stagger-2">
-              {profile.headline}
+              {parseBracketText(profile.headline).map((seg, i) =>
+                seg.highlighted ? (
+                  <span key={i} className="text-primary font-bold">{seg.text}</span>
+                ) : (
+                  <span key={i}>{seg.text}</span>
+                )
+              )}
             </p>
 
             {/* Summary */}

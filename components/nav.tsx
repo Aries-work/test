@@ -16,12 +16,28 @@ export function Nav() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const isHomepage = typeof window !== 'undefined' && window.location.pathname === '/';
+
   const navLinks = [
-    { label: 'Home', href: '#' },
-    { label: 'Projects', href: '#projects' },
-    { label: 'About', href: '#about' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Home', href: '/' },
+    { label: 'Projects', href: '/#projects' },
+    { label: 'About', href: '/#about' },
+    { label: 'Contact', href: '/#contact' },
   ];
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    const hashIndex = href.indexOf('#');
+    if (hashIndex === -1) return;
+
+    const hash = href.slice(hashIndex);
+    if (isHomepage) {
+      e.preventDefault();
+      const target = document.querySelector(hash);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   return (
     <nav
@@ -33,7 +49,7 @@ export function Nav() {
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <a
-          href="#"
+          href="/"
           className="font-serif text-lg tracking-tight hover:text-accent transition-colors duration-300"
         >
           Aries Liu
@@ -46,6 +62,7 @@ export function Nav() {
               <a
                 key={link.label}
                 href={link.href}
+                onClick={(e) => handleClick(e, link.href)}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
               >
                 {link.label}

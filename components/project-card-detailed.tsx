@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import { Briefcase, Calendar, Building2, Tag, Target, Zap, TrendingUp, Award, ArrowRight } from 'lucide-react';
+import { Calendar, Building2, Crosshair, ListChecks, Zap, TrendingUp, Award, ArrowRight } from 'lucide-react';
 import { Project } from '@/lib/types';
 
 interface ProjectCardDetailedProps {
@@ -37,7 +37,7 @@ export function ProjectCardDetailed({ project, slug }: ProjectCardDetailedProps)
               <Badge
                 key={tag}
                 variant="outline"
-                className="text-[10px] px-2 py-0.5 border-white/20 text-white dark:text-white dark:bg-black/30 bg-white/70 text-foreground backdrop-blur-sm font-medium"
+                className="text-[10px] px-2 py-0.5 border-border/30 bg-background/70 backdrop-blur-sm font-medium"
               >
                 {tag}
               </Badge>
@@ -59,14 +59,6 @@ export function ProjectCardDetailed({ project, slug }: ProjectCardDetailedProps)
                 {project.company}
               </span>
               <span className="flex items-center gap-1.5">
-                <Tag className="w-3.5 h-3.5 text-accent/60" />
-                {project.industry}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Briefcase className="w-3.5 h-3.5 text-accent/60" />
-                {project.role}
-              </span>
-              <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-accent/60" />
                 {project.duration}
               </span>
@@ -84,18 +76,28 @@ export function ProjectCardDetailed({ project, slug }: ProjectCardDetailedProps)
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest text-accent/70">
-                <Target className="w-3.5 h-3.5" />
-                Objective
+                <Crosshair className="w-3.5 h-3.5" />
+                Situation
               </div>
               <p className="text-sm leading-relaxed text-foreground/80 line-clamp-3">
-                {project.objective}
+                {project.situation}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest text-accent/70">
+                <ListChecks className="w-3.5 h-3.5" />
+                Task
+              </div>
+              <p className="text-sm leading-relaxed text-foreground/80 line-clamp-3">
+                {project.task}
               </p>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest text-accent/70">
                 <Zap className="w-3.5 h-3.5" />
-                Actions
+                Roles & Deliverables
               </div>
               <ul className="space-y-1.5">
                 {actions.slice(0, 3).map((action, i) => (
