@@ -36,7 +36,7 @@ export function ProjectCardCompact({ project, slug }: ProjectCardCompactProps) {
               <Badge
                 key={tag}
                 variant="outline"
-                className="text-[10px] px-2 py-0.5 border-white/20 text-white bg-black/30 backdrop-blur-sm font-medium"
+                className="text-[10px] px-2 py-0.5 border-white/20 text-white dark:text-white dark:bg-black/30 bg-white/70 text-foreground backdrop-blur-sm font-medium"
               >
                 {tag}
               </Badge>
