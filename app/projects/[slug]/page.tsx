@@ -1,6 +1,6 @@
 import { fetchPortfolioData } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Building2, Calendar, Crosshair, ListChecks, Zap, TrendingUp, Award } from 'lucide-react';
+import { ArrowLeft, Building2, Calendar, Briefcase, Tag, Crosshair, ListChecks, Zap, TrendingUp, Award } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { CTASection } from '@/components/cta-section';
 import { Footer } from '@/components/footer';
@@ -78,10 +78,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.05] mb-4">
               {project.project_name}
             </h1>
-
-            <p className="text-lg text-muted-foreground">
-              {project.company} | {project.duration}
-            </p>
           </div>
 
           {/* Description */}
@@ -90,12 +86,24 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           </p>
 
           {/* Metadata grid */}
-          <div className="grid grid-cols-2 gap-6 mb-12 p-6 rounded-xl border border-border/40 bg-card/50">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-12 p-6 rounded-xl border border-border/40 bg-card/50">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
                 Company
               </p>
               <p className="text-sm font-medium">{project.company}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
+                Industry
+              </p>
+              <p className="text-sm font-medium">{project.industry}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
+                Role
+              </p>
+              <p className="text-sm font-medium">{project.role}</p>
             </div>
             <div>
               <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">

@@ -47,7 +47,7 @@ export function Hero({ profile }: HeroProps) {
             <p className="text-xl sm:text-2xl md:text-3xl font-light leading-relaxed text-foreground/80 max-w-xl animate-fade-in-up stagger-2">
               {parseBracketText(profile.headline).map((seg, i) =>
                 seg.highlighted ? (
-                  <span key={i} className="text-primary font-bold">{seg.text}</span>
+                  <span key={i} className="text-accent font-bold">{seg.text}</span>
                 ) : (
                   <span key={i}>{seg.text}</span>
                 )
