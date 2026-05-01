@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { CTASection } from '@/components/cta-section';
 import { Footer } from '@/components/footer';
 import { Nav } from '@/components/nav';
+import { parseQuotedList } from '@/lib/utils';
 import type { Metadata } from 'next';
 
 function slugify(name: string): string {
@@ -45,7 +46,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   }
 
   const tags = project.Tags.split(',').map((t) => t.trim());
-  const actions = project.actions.split(',').map((a) => a.trim()).filter(Boolean);
+  const actions = parseQuotedList(project.actions);
+  const impacts = parseQuotedList(project.impact);
 
   return (
     <div className="min-h-screen bg-background">
@@ -174,14 +176,18 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
           {/* Impact */}
           <section className="mb-16">
-            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-4">
+            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-6">
               <TrendingUp className="w-4 h-4" />
               Impact
             </div>
-            <div className="p-6 rounded-xl bg-accent/[0.06] border border-accent/15">
-              <p className="text-lg font-semibold text-accent">
-                {project.impact}
-              </p>
+            <div className="space-y-4">
+              {impacts.map((item, i) => (
+                <div key={i} className="pl-6 border-l-2 border-accent/30">
+                  <p className="text-base leading-[1.8] text-foreground/80">
+                    {item}
+                  </p>
+                </div>
+              ))}
             </div>
           </section>
 

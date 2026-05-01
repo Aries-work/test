@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Building2, Crosshair, ListChecks, Zap, TrendingUp, Award, ArrowRight } from 'lucide-react';
 import { Project } from '@/lib/types';
+import { parseQuotedList } from '@/lib/utils';
 
 interface ProjectCardDetailedProps {
   project: Project;
@@ -16,7 +17,8 @@ const projectImages = [
 
 export function ProjectCardDetailed({ project, slug }: ProjectCardDetailedProps) {
   const tags = project.Tags.split(',').map((t) => t.trim());
-  const actions = project.actions.split(',').map((a) => a.trim()).filter(Boolean);
+  const actions = parseQuotedList(project.actions);
+  const impacts = parseQuotedList(project.impact);
   const imageIndex = Math.abs(hashCode(project.project_name)) % projectImages.length;
 
   return (
@@ -114,11 +116,14 @@ export function ProjectCardDetailed({ project, slug }: ProjectCardDetailedProps)
                 <TrendingUp className="w-3.5 h-3.5" />
                 Impact
               </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent/10 border border-accent/15">
-                <span className="text-sm font-semibold text-accent">
-                  {project.impact}
-                </span>
-              </div>
+              <ul className="space-y-1.5">
+                {impacts.slice(0, 3).map((item, i) => (
+                  <li key={i} className="text-sm text-foreground/80 flex items-start gap-2">
+                    <span className="w-1 h-1 rounded-full bg-accent/50 mt-2 shrink-0" />
+                    <span className="line-clamp-1">{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <div className="space-y-2">

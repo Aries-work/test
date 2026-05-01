@@ -34,3 +34,15 @@ export function parseBracketText(text: string): BracketSegment[] {
 
   return segments;
 }
+
+/**
+ * Parses a quoted-string list like `"item1", "item2"` into an array of strings.
+ * Falls back to comma-split if no quotes are found.
+ */
+export function parseQuotedList(text: string): string[] {
+  const matches = text.match(/"([^"]*)"/g);
+  if (matches && matches.length > 0) {
+    return matches.map((m) => m.slice(1, -1).trim()).filter(Boolean);
+  }
+  return text.split(',').map((s) => s.trim()).filter(Boolean);
+}
