@@ -180,10 +180,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               <TrendingUp className="w-4 h-4" />
               Impact
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {impacts.map((item, i) => (
-                <div key={i} className="pl-6 border-l-2 border-accent/30">
-                  <p className="text-base leading-[1.8] text-foreground/80">
+                <div key={i} className="flex items-start gap-3 p-4 rounded-lg bg-accent/[0.06] border border-accent/15">
+                  <span className="mt-1.5 w-2 h-2 rounded-full bg-accent shrink-0" />
+                  <p className="text-base leading-[1.8] font-medium text-accent">
                     {item}
                   </p>
                 </div>
