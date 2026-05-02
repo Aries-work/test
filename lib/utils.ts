@@ -32,7 +32,8 @@ export function parseBracketText(text: string): BracketSegment[] {
   return segments;
 }
 
-export function parseQuotedList(text: string): string[] {
+export function parseQuotedList(text: string | undefined): string[] {
+  if (!text) return [];
   const matches = text.match(/"([^"]*)"/g);
   if (matches && matches.length > 0) {
     return matches.map((m) => m.slice(1, -1).trim()).filter(Boolean);
@@ -50,18 +51,18 @@ const PLACEHOLDER_PHRASES = [
   'todo',
 ];
 
-export function isPlaceholder(text: string): boolean {
+export function isPlaceholder(text: string | undefined): boolean {
+  if (!text) return true;
   const normalized = text.trim().toLowerCase();
   if (!normalized) return true;
   return PLACEHOLDER_PHRASES.some((p) => normalized === p || normalized === `${p}.`);
 }
 
 export function getProjectSubtitle(project: Project): string {
-  if (!isPlaceholder(project.short_description)) {
+  if (project.short_description && !isPlaceholder(project.short_description)) {
     return project.short_description;
   }
-  const parts = [project.role, `at ${project.company}`];
-  return parts.join(' ');
+  return `${project.role} at ${project.company}`;
 }
 
 export function extractIndustries(projects: Project[]): string[] {
@@ -100,7 +101,7 @@ export function groupProjectsByCompany(projects: Project[]): Map<string, Project
   return groups;
 }
 
-export function isValidImageUrl(url: string): boolean {
+export function isValidImageUrl(url: string | undefined): boolean {
   if (!url || !url.trim()) return false;
   try {
     const parsed = new URL(url);
@@ -108,4 +109,14 @@ export function isValidImageUrl(url: string): boolean {
   } catch {
     return false;
   }
+}
+
+export function getProjectTags(project: Project): string[] {
+  if (!project.Tags) return [];
+  return project.Tags.split(',').map((t) => t.trim()).filter(Boolean);
+}
+
+export function getProjectIndustries(project: Project): string[] {
+  if (!project.industry) return [];
+  return project.industry.split('/').map((i) => i.trim()).filter(Boolean);
 }

@@ -14,14 +14,14 @@ export interface Project {
   industry: string;
   role: string;
   duration: string;
-  short_description: string;
-  situation: string;
-  task: string;
-  actions: string;
-  impact: string;
-  result: string;
-  img1: string;
-  img2: string;
+  short_description?: string;
+  situation?: string;
+  task?: string;
+  actions?: string;
+  impact?: string;
+  result?: string;
+  img1?: string;
+  img2?: string;
 }
 
 export interface PortfolioData {

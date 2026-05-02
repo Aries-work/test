@@ -1,22 +1,22 @@
 import Link from 'next/link';
 import { ArrowRight, Briefcase, Calendar } from 'lucide-react';
 import { Project } from '@/lib/types';
-import { slugify, getProjectSubtitle } from '@/lib/utils';
+import { slugify, getProjectSubtitle, getProjectTags, getProjectIndustries } from '@/lib/utils';
 
 interface ProjectCardProps {
   project: Project;
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const tags = project.Tags.split(',').map((t) => t.trim());
   const slug = slugify(project.project_name);
   const subtitle = getProjectSubtitle(project);
-  const industries = project.industry.split('/').map((i) => i.trim());
+  const tags = getProjectTags(project);
+  const industries = getProjectIndustries(project);
 
   return (
     <Link href={`/projects/${slug}`} className="group block">
       <div className="relative bg-card border border-border/60 hover-lift h-full flex flex-col overflow-hidden">
-        {/* Styled header area with industry + tags (replaces fake image) */}
+        {/* Styled header area with industry + tags */}
         <div className="card-header-gradient px-5 pt-5 pb-4">
           <div className="flex items-start justify-between mb-3">
             <div className="flex flex-wrap gap-1.5">
@@ -30,16 +30,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
               ))}
             </div>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-[10px] px-2 py-0.5 bg-secondary text-muted-foreground font-medium"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] px-2 py-0.5 bg-secondary text-muted-foreground font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Content */}

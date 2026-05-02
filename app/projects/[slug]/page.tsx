@@ -4,7 +4,15 @@ import { ArrowLeft } from 'lucide-react';
 import { CTASection } from '@/components/cta-section';
 import { Footer } from '@/components/footer';
 import { Nav } from '@/components/nav';
-import { parseQuotedList, isPlaceholder, getProjectSubtitle, isValidImageUrl, slugify } from '@/lib/utils';
+import {
+  parseQuotedList,
+  isPlaceholder,
+  getProjectSubtitle,
+  isValidImageUrl,
+  slugify,
+  getProjectTags,
+  getProjectIndustries,
+} from '@/lib/utils';
 import type { Metadata } from 'next';
 
 interface PageProps {
@@ -19,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `${project.project_name} | Aries Liu`,
     description: isPlaceholder(project.short_description)
       ? `${project.role} at ${project.company} - ${project.industry}`
-      : project.short_description,
+      : project.short_description || `${project.role} at ${project.company}`,
   };
 }
 
@@ -50,13 +58,19 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const tags = project.Tags.split(',').map((t) => t.trim());
-  const industries = project.industry.split('/').map((i) => i.trim());
+  const tags = getProjectTags(project);
+  const industries = getProjectIndustries(project);
   const actions = parseQuotedList(project.actions);
   const impacts = parseQuotedList(project.impact);
   const subtitle = getProjectSubtitle(project);
   const hasImg1 = isValidImageUrl(project.img1);
   const hasImg2 = isValidImageUrl(project.img2);
+  const hasSituation = !isPlaceholder(project.situation);
+  const hasTask = !isPlaceholder(project.task);
+  const hasResult = !isPlaceholder(project.result);
+  const hasActions = actions.length > 0 && actions[0] !== '';
+  const hasImpacts = impacts.length > 0 && impacts[0] !== '';
+  const hasAnyContent = hasSituation || hasTask || hasActions || hasImpacts || hasResult;
 
   return (
     <div className="min-h-screen bg-background">
@@ -140,113 +154,110 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </div>
           )}
 
-          {/* 01 - Situation */}
-          {!isPlaceholder(project.situation) && (
-            <section className="mb-12">
-              <SectionHeader number="01" label="Situation" />
-              <p className="text-[15px] leading-[1.8] text-foreground/80 max-w-2xl">
-                {project.situation}
-              </p>
-            </section>
-          )}
+          {/* Content sections - only render if any real content exists */}
+          {hasAnyContent && (
+            <>
+              {/* 01 - Situation */}
+              {hasSituation && (
+                <section className="mb-12">
+                  <SectionHeader number="01" label="Situation" />
+                  <p className="text-[15px] leading-[1.8] text-foreground/80 max-w-2xl">
+                    {project.situation}
+                  </p>
+                </section>
+              )}
 
-          {!isPlaceholder(project.situation) && (
-            <div className="h-px bg-border/40 mb-12" />
-          )}
+              {hasSituation && <div className="h-px bg-border/40 mb-12" />}
 
-          {/* 02 - Task */}
-          {!isPlaceholder(project.task) && (
-            <section className="mb-12">
-              <SectionHeader number="02" label="Task" />
-              <p className="text-[15px] leading-[1.8] text-foreground/80 max-w-2xl">
-                {project.task}
-              </p>
-            </section>
-          )}
+              {/* 02 - Task */}
+              {hasTask && (
+                <section className="mb-12">
+                  <SectionHeader number="02" label="Task" />
+                  <p className="text-[15px] leading-[1.8] text-foreground/80 max-w-2xl">
+                    {project.task}
+                  </p>
+                </section>
+              )}
 
-          {/* img1 */}
-          {hasImg1 && (
-            <div className="overflow-hidden mb-12">
-              <img
-                src={project.img1}
-                alt={`${project.project_name} - 1`}
-                className="w-full h-56 sm:h-72 object-cover"
-              />
-            </div>
-          )}
+              {/* img1 */}
+              {hasImg1 && (
+                <div className="overflow-hidden mb-12">
+                  <img
+                    src={project.img1}
+                    alt={`${project.project_name} - 1`}
+                    className="w-full h-56 sm:h-72 object-cover"
+                  />
+                </div>
+              )}
 
-          {!isPlaceholder(project.task) && (
-            <div className="h-px bg-border/40 mb-12" />
-          )}
+              {hasTask && <div className="h-px bg-border/40 mb-12" />}
 
-          {/* 03 - Roles & Deliverables */}
-          {actions.length > 0 && actions[0] !== '' && (
-            <section className="mb-12">
-              <SectionHeader number="03" label="Roles & Deliverables" />
-              <div className="space-y-4">
-                {actions.map((action, i) => (
-                  <div key={i} className="flex items-start gap-4">
-                    <span className="text-[12px] font-mono font-semibold text-accent mt-0.5 w-5 shrink-0 text-right">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <p className="text-[15px] leading-[1.8] text-foreground/80">
-                      {action}
-                    </p>
+              {/* 03 - Roles & Deliverables */}
+              {hasActions && (
+                <section className="mb-12">
+                  <SectionHeader number="03" label="Roles & Deliverables" />
+                  <div className="space-y-4">
+                    {actions.map((action, i) => (
+                      <div key={i} className="flex items-start gap-4">
+                        <span className="text-[12px] font-mono font-semibold text-accent mt-0.5 w-5 shrink-0 text-right">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <p className="text-[15px] leading-[1.8] text-foreground/80">
+                          {action}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+                </section>
+              )}
 
-          {actions.length > 0 && actions[0] !== '' && (
-            <div className="h-px bg-border/40 mb-12" />
-          )}
+              {hasActions && <div className="h-px bg-border/40 mb-12" />}
 
-          {/* 04 - Impact */}
-          {impacts.length > 0 && impacts[0] !== '' && (
-            <section className="mb-12">
-              <SectionHeader number="04" label="Impact" />
-              <div className="space-y-3">
-                {impacts.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-4 bg-accent/[0.06] border border-accent/15">
-                    <span className="flex items-center justify-center w-6 h-6 bg-accent text-accent-foreground text-[11px] font-mono font-bold shrink-0">
-                      {i + 1}
-                    </span>
-                    <p className="text-[15px] leading-[1.8] font-medium text-accent">
-                      {item}
-                    </p>
+              {/* 04 - Impact */}
+              {hasImpacts && (
+                <section className="mb-12">
+                  <SectionHeader number="04" label="Impact" />
+                  <div className="space-y-3">
+                    {impacts.map((item, i) => (
+                      <div key={i} className="flex items-start gap-3 p-4 bg-accent/[0.06] border border-accent/15">
+                        <span className="flex items-center justify-center w-6 h-6 bg-accent text-accent-foreground text-[11px] font-mono font-bold shrink-0">
+                          {i + 1}
+                        </span>
+                        <p className="text-[15px] leading-[1.8] font-medium text-accent">
+                          {item}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </section>
+                </section>
+              )}
+
+              {/* img2 */}
+              {hasImg2 && (
+                <div className="overflow-hidden mb-12">
+                  <img
+                    src={project.img2}
+                    alt={`${project.project_name} - 2`}
+                    className="w-full h-56 sm:h-72 object-cover"
+                  />
+                </div>
+              )}
+
+              {hasImpacts && <div className="h-px bg-border/40 mb-12" />}
+
+              {/* 05 - Result */}
+              {hasResult && (
+                <section className="mb-16">
+                  <SectionHeader number="05" label="Result" />
+                  <p className="text-base leading-[1.8] text-foreground/80 max-w-2xl">
+                    {project.result}
+                  </p>
+                </section>
+              )}
+            </>
           )}
 
-          {/* img2 */}
-          {hasImg2 && (
-            <div className="overflow-hidden mb-12">
-              <img
-                src={project.img2}
-                alt={`${project.project_name} - 2`}
-                className="w-full h-56 sm:h-72 object-cover"
-              />
-            </div>
-          )}
-
-          {impacts.length > 0 && impacts[0] !== '' && (
-            <div className="h-px bg-border/40 mb-12" />
-          )}
-
-          {/* 05 - Result */}
-          {!isPlaceholder(project.result) && (
-            <section className="mb-16">
-              <SectionHeader number="05" label="Result" />
-              <p className="text-base leading-[1.8] text-foreground/80 max-w-2xl">
-                {project.result}
-              </p>
-            </section>
-          )}
-
-          {/* Navigation between projects */}
+          {/* Navigation back */}
           <div className="pt-8 border-t border-border/40">
             <a
               href="/#projects"

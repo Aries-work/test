@@ -1,5 +1,5 @@
 import { ProfileStatic, Project } from '@/lib/types';
-import { parseQuotedList, extractDomains } from '@/lib/utils';
+import { parseQuotedList, extractDomains, isPlaceholder } from '@/lib/utils';
 
 interface AboutSectionProps {
   profile: ProfileStatic;
@@ -59,41 +59,46 @@ export function AboutSection({ profile, projects }: AboutSectionProps) {
               Experience
             </p>
             <div className="space-y-0">
-              {uniqueExperiences.map((exp, index) => (
-                <div
-                  key={index}
-                  className="relative pl-6 pb-6 last:pb-0"
-                >
-                  {/* Timeline line */}
-                  <div className="absolute left-0 top-2 bottom-0 w-px bg-border/60" />
+              {uniqueExperiences.map((exp, index) => {
+                const impactItems = parseQuotedList(exp.impact);
+                const hasImpact = impactItems.length > 0 && impactItems[0] !== '' && !isPlaceholder(impactItems[0]);
 
-                  {/* Timeline dot */}
-                  <div className="absolute left-[-3px] top-1.5 w-[7px] h-[7px] rounded-full bg-accent" />
+                return (
+                  <div
+                    key={index}
+                    className="relative pl-6 pb-6 last:pb-0"
+                  >
+                    {/* Timeline line */}
+                    <div className="absolute left-0 top-2 bottom-0 w-px bg-border/60" />
 
-                  {/* Content */}
-                  <div className="space-y-1.5">
-                    <h4 className="font-serif text-[15px] leading-snug font-medium">
-                      {exp.company}
-                    </h4>
-                    <p className="text-[12px] text-muted-foreground">
-                      {exp.role}
-                      <span className="mx-1.5 text-border">|</span>
-                      {exp.duration}
-                      <span className="mx-1.5 text-border">|</span>
-                      {exp.industry}
-                    </p>
-                    {exp.impact && (
-                      <div className="mt-2 space-y-1">
-                        {parseQuotedList(exp.impact).map((item, i) => (
-                          <p key={i} className="text-[13px] text-accent font-medium">
-                            {item}
-                          </p>
-                        ))}
-                      </div>
-                    )}
+                    {/* Timeline dot */}
+                    <div className="absolute left-[-3px] top-1.5 w-[7px] h-[7px] rounded-full bg-accent" />
+
+                    {/* Content */}
+                    <div className="space-y-1.5">
+                      <h4 className="font-serif text-[15px] leading-snug font-medium">
+                        {exp.company}
+                      </h4>
+                      <p className="text-[12px] text-muted-foreground">
+                        {exp.role}
+                        <span className="mx-1.5 text-border">|</span>
+                        {exp.duration}
+                        <span className="mx-1.5 text-border">|</span>
+                        {exp.industry}
+                      </p>
+                      {hasImpact && (
+                        <div className="mt-2 space-y-1">
+                          {impactItems.map((item, i) => (
+                            <p key={i} className="text-[13px] text-accent font-medium">
+                              {item}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
