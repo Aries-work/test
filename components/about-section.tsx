@@ -1,5 +1,5 @@
 import { ProfileStatic, Project } from '@/lib/types';
-import { parseQuotedList } from '@/lib/utils';
+import { parseQuotedList, extractDomains } from '@/lib/utils';
 
 interface AboutSectionProps {
   profile: ProfileStatic;
@@ -19,7 +19,7 @@ export function AboutSection({ profile, projects }: AboutSectionProps) {
     (exp, i, arr) => arr.findIndex((e) => e.company === exp.company) === i
   );
 
-  const skills = ['FinTech', 'Gaming', 'MarTech', 'Healthcare', 'SaaS', 'ERP', 'Mobile'];
+  const domains = extractDomains(profile.summary, projects);
 
   return (
     <section id="about" className="py-24 border-t border-border/40">
@@ -41,10 +41,12 @@ export function AboutSection({ profile, projects }: AboutSectionProps) {
                 Domains
               </p>
               <p className="text-[14px] text-foreground/80">
-                {skills.map((skill, i) => (
-                  <span key={skill}>
-                    <span className="text-accent font-medium">{skill}</span>
-                    {i < skills.length - 1 && <span className="text-muted-foreground mx-1.5">&middot;</span>}
+                {domains.map((domain, i) => (
+                  <span key={domain}>
+                    <span className="text-accent font-medium">{domain}</span>
+                    {i < domains.length - 1 && (
+                      <span className="text-muted-foreground mx-1.5">&middot;</span>
+                    )}
                   </span>
                 ))}
               </p>
@@ -74,12 +76,20 @@ export function AboutSection({ profile, projects }: AboutSectionProps) {
                       {exp.company}
                     </h4>
                     <p className="text-[12px] text-muted-foreground">
-                      {exp.role} <span className="mx-1.5 text-border">|</span> {exp.duration} <span className="mx-1.5 text-border">|</span> {exp.industry}
+                      {exp.role}
+                      <span className="mx-1.5 text-border">|</span>
+                      {exp.duration}
+                      <span className="mx-1.5 text-border">|</span>
+                      {exp.industry}
                     </p>
                     {exp.impact && (
-                      <p className="text-[13px] text-accent font-medium">
-                        {parseQuotedList(exp.impact).join(' / ')}
-                      </p>
+                      <div className="mt-2 space-y-1">
+                        {parseQuotedList(exp.impact).map((item, i) => (
+                          <p key={i} className="text-[13px] text-accent font-medium">
+                            {item}
+                          </p>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>

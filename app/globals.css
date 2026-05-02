@@ -90,17 +90,6 @@
   to { opacity: 1; }
 }
 
-@keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 .animate-fade-in-up {
   animation: fade-in-up 0.5s ease-out forwards;
   opacity: 0;
@@ -108,11 +97,6 @@
 
 .animate-fade-in {
   animation: fade-in 0.4s ease-out forwards;
-  opacity: 0;
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.4s ease-out forwards;
   opacity: 0;
 }
 
@@ -129,4 +113,12 @@
 .hover-lift:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px -12px hsl(var(--accent) / 0.15);
+}
+
+.card-header-gradient {
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.12) 0%, hsl(var(--card)) 100%);
+}
+
+.dark .card-header-gradient {
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.15) 0%, hsl(var(--card)) 100%);
 }

@@ -1,11 +1,18 @@
 import { ArrowRight, Mail } from 'lucide-react';
-import { ProfileStatic } from '@/lib/types';
+import { ProfileStatic, Project } from '@/lib/types';
+import { extractIndustries } from '@/lib/utils';
 
 interface CTASectionProps {
   profile: ProfileStatic;
+  projects?: Project[];
 }
 
-export function CTASection({ profile }: CTASectionProps) {
+export function CTASection({ profile, projects }: CTASectionProps) {
+  const industries = projects ? extractIndustries(projects) : [];
+  const industryText = industries.length > 0
+    ? `across ${industries.slice(0, 3).join(', ')}${industries.length > 3 ? ', and beyond' : ''}`
+    : 'across FinTech, Gaming, and beyond';
+
   return (
     <section id="contact" className="py-24 border-t border-border/40">
       <div className="max-w-6xl mx-auto px-6 text-center">
@@ -16,7 +23,7 @@ export function CTASection({ profile }: CTASectionProps) {
           Get in Touch
         </h2>
         <p className="text-[15px] text-muted-foreground max-w-md mx-auto leading-relaxed mb-8">
-          Open to product leadership roles, consulting opportunities, and collaborations across FinTech, Gaming, and beyond.
+          Open to product leadership roles, consulting opportunities, and collaborations {industryText}.
         </p>
 
         <a

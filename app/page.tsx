@@ -18,7 +18,7 @@ export default async function Home() {
         <Hero profile={profile} />
         <ProjectSection projects={projects} />
         <AboutSection profile={profile} projects={projects} />
-        <CTASection profile={profile} />
+        <CTASection profile={profile} projects={projects} />
       </main>
       <Footer profile={profile} />
     </div>
