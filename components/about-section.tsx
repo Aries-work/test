@@ -1,5 +1,5 @@
 import { ProfileStatic, Project } from '@/lib/types';
-import { Building2, Calendar, Briefcase } from 'lucide-react';
+import { parseQuotedList } from '@/lib/utils';
 
 interface AboutSectionProps {
   profile: ProfileStatic;
@@ -19,75 +19,66 @@ export function AboutSection({ profile, projects }: AboutSectionProps) {
     (exp, i, arr) => arr.findIndex((e) => e.company === exp.company) === i
   );
 
+  const skills = ['FinTech', 'Gaming', 'MarTech', 'Healthcare', 'SaaS', 'ERP', 'Mobile'];
+
   return (
-    <section id="about" className="py-24 border-t border-border/30">
+    <section id="about" className="py-24 border-t border-border/40">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid lg:grid-cols-[1fr_1.2fr] gap-16">
           {/* Left: About text */}
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-3">
+            <p className="text-[13px] font-medium tracking-[0.15em] uppercase text-accent mb-3">
               About
             </p>
-            <h2 className="font-serif text-4xl sm:text-5xl tracking-tight mb-6">
+            <h2 className="font-serif text-3xl sm:text-4xl tracking-tight mb-6">
               About Me
             </h2>
-            <p className="text-base leading-[1.8] text-muted-foreground mb-6">
+            <p className="text-[15px] leading-[1.8] text-muted-foreground mb-8">
               {profile.summary}
             </p>
-            <div className="flex flex-wrap gap-2">
-              {['FinTech', 'Gaming', 'MarTech', 'Healthcare', 'SaaS', 'ERP', 'Mobile'].map(
-                (skill) => (
-                  <span
-                    key={skill}
-                    className="px-3 py-1 text-[11px] font-medium tracking-wider uppercase rounded-full border border-border/60 text-muted-foreground bg-secondary/50"
-                  >
-                    {skill}
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-3">
+                Domains
+              </p>
+              <p className="text-[14px] text-foreground/80">
+                {skills.map((skill, i) => (
+                  <span key={skill}>
+                    <span className="text-accent font-medium">{skill}</span>
+                    {i < skills.length - 1 && <span className="text-muted-foreground mx-1.5">&middot;</span>}
                   </span>
-                )
-              )}
+                ))}
+              </p>
             </div>
           </div>
 
           {/* Right: Experience timeline */}
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-6">
+          <div className="bg-card/50 border border-border/40 p-6">
+            <p className="text-[13px] font-medium tracking-[0.15em] uppercase text-accent mb-6">
               Experience
             </p>
             <div className="space-y-0">
               {uniqueExperiences.map((exp, index) => (
                 <div
                   key={index}
-                  className="relative pl-8 pb-8 last:pb-0 animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.15}s` }}
+                  className="relative pl-6 pb-6 last:pb-0"
                 >
                   {/* Timeline line */}
-                  <div className="absolute left-[7px] top-3 bottom-0 w-px bg-border/60" />
+                  <div className="absolute left-0 top-2 bottom-0 w-px bg-border/60" />
 
                   {/* Timeline dot */}
-                  <div className="absolute left-0 top-2 w-[15px] h-[15px] rounded-full border-2 border-accent/50 bg-background" />
+                  <div className="absolute left-[-3px] top-1.5 w-[7px] h-[7px] rounded-full bg-accent" />
 
                   {/* Content */}
-                  <div className="space-y-2">
-                    <h4 className="font-serif text-base leading-snug">
+                  <div className="space-y-1.5">
+                    <h4 className="font-serif text-[15px] leading-snug font-medium">
                       {exp.company}
                     </h4>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1.5">
-                        <Briefcase className="w-3 h-3 text-accent/50" />
-                        {exp.role}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="w-3 h-3 text-accent/50" />
-                        {exp.duration}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Building2 className="w-3 h-3 text-accent/50" />
-                        {exp.industry}
-                      </span>
-                    </div>
+                    <p className="text-[12px] text-muted-foreground">
+                      {exp.role} <span className="mx-1.5 text-border">|</span> {exp.duration} <span className="mx-1.5 text-border">|</span> {exp.industry}
+                    </p>
                     {exp.impact && (
-                      <p className="text-sm text-accent/80 font-medium">
-                        {exp.impact}
+                      <p className="text-[13px] text-accent font-medium">
+                        {parseQuotedList(exp.impact).join(' / ')}
                       </p>
                     )}
                   </div>

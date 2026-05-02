@@ -19,7 +19,6 @@ export function Nav() {
   const isHomepage = typeof window !== 'undefined' && window.location.pathname === '/';
 
   const navLinks = [
-    { label: 'Home', href: '/' },
     { label: 'Projects', href: '/#projects' },
     { label: 'About', href: '/#about' },
     { label: 'Contact', href: '/#contact' },
@@ -40,41 +39,37 @@ export function Nav() {
   };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? 'bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-sm'
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/60">
+      {scrolled && (
+        <div className="absolute top-0 left-0 right-0 h-px bg-accent/40" />
+      )}
+
+      <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
         <a
           href="/"
-          className="font-serif text-lg tracking-tight hover:text-accent transition-colors duration-300"
+          className="text-sm font-semibold tracking-tight text-foreground hover:text-accent transition-colors duration-200"
         >
-          Aries Liu
+          Aries L.
         </a>
 
-        <div className="flex items-center gap-1 sm:gap-6">
-          {/* Desktop nav links */}
+        <div className="flex items-center gap-6">
           <div className="hidden sm:flex items-center gap-6">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={(e) => handleClick(e, link.href)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                className="text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200"
               >
                 {link.label}
               </a>
             ))}
           </div>
 
-          {/* Theme toggle */}
           {mounted && (
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="flex items-center justify-center w-9 h-9 rounded-full border border-border hover:border-accent/40 hover:bg-accent/[0.04] transition-all duration-300"
+              className="text-muted-foreground hover:text-accent transition-colors duration-200"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (

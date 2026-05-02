@@ -1,7 +1,6 @@
 import { fetchPortfolioData } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Building2, Calendar, Briefcase, Tag, Crosshair, ListChecks, Zap, TrendingUp, Award } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { ArrowLeft } from 'lucide-react';
 import { CTASection } from '@/components/cta-section';
 import { Footer } from '@/components/footer';
 import { Nav } from '@/components/nav';
@@ -36,6 +35,17 @@ export async function generateStaticParams() {
   }));
 }
 
+function SectionHeader({ number, label }: { number: string; label: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-5">
+      <span className="text-[11px] font-mono font-semibold text-accent tracking-wider">{number}</span>
+      <h3 className="text-[13px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
+        {label}
+      </h3>
+    </div>
+  );
+}
+
 export default async function ProjectDetailPage({ params }: PageProps) {
   const data = await fetchPortfolioData();
   const project = data.Dynamic.find((p) => slugify(p.project_name) === params.slug);
@@ -53,24 +63,24 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     <div className="min-h-screen bg-background">
       <Nav />
 
-      <main className="pt-24 pb-16">
-        <div className="max-w-4xl mx-auto px-6">
+      <main className="pt-20 pb-16">
+        <div className="max-w-5xl mx-auto px-6">
           {/* Back link */}
           <a
             href="/#projects"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent transition-colors duration-300 mb-10 group"
+            className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200 mb-10 group"
           >
-            <ArrowLeft className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" />
-            Back to all projects
+            <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
+            All projects
           </a>
 
           {/* Header */}
-          <div className="mb-10">
-            <div className="flex flex-wrap gap-2 mb-4">
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-2 mb-5">
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-block px-3 py-1 text-[11px] font-medium tracking-widest uppercase rounded-full border border-accent/25 text-accent bg-accent/[0.06]"
+                  className="text-[11px] px-2.5 py-1 font-medium tracking-wider uppercase bg-secondary text-muted-foreground"
                 >
                   {tag}
                 </span>
@@ -80,93 +90,85 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.05] mb-4">
               {project.project_name}
             </h1>
+
+            <p className="text-[15px] leading-[1.8] text-muted-foreground max-w-2xl">
+              {project.short_description}
+            </p>
           </div>
 
-          {/* Description */}
-          <p className="text-base leading-[1.8] text-foreground/80 mb-10 max-w-2xl">
-            {project.short_description}
-          </p>
-
-          {/* Metadata grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-12 p-6 rounded-xl border border-border/40 bg-card/50">
+          {/* Metadata row with dividers */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-12 py-5 border-y border-border/60 text-[13px]">
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
-                Company
-              </p>
-              <p className="text-sm font-medium">{project.company}</p>
+              <span className="text-muted-foreground">Company</span>
+              <span className="ml-2 font-medium">{project.company}</span>
             </div>
+            <div className="hidden sm:block w-px h-4 bg-border/60" />
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
-                Industry
-              </p>
-              <p className="text-sm font-medium">{project.industry}</p>
+              <span className="text-muted-foreground">Industry</span>
+              <span className="ml-2 font-medium">{project.industry}</span>
             </div>
+            <div className="hidden sm:block w-px h-4 bg-border/60" />
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
-                Role
-              </p>
-              <p className="text-sm font-medium">{project.role}</p>
+              <span className="text-muted-foreground">Role</span>
+              <span className="ml-2 font-medium">{project.role}</span>
             </div>
+            <div className="hidden sm:block w-px h-4 bg-border/60" />
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground mb-1">
-                Duration
-              </p>
-              <p className="text-sm font-medium">{project.duration}</p>
+              <span className="text-muted-foreground">Duration</span>
+              <span className="ml-2 font-medium">{project.duration}</span>
             </div>
           </div>
 
           {/* Cover image */}
-          <div className="rounded-xl overflow-hidden mb-16 border border-border/30">
+          <div className="overflow-hidden mb-16">
             <img
               src="https://images.pexels.com/photos/8370752/pexels-photo-8370752.jpeg?auto=compress&cs=tinysrgb&w=1200&h=600&fit=crop"
               alt={project.project_name}
-              className="w-full h-64 sm:h-80 md:h-96 object-cover"
+              className="w-full h-64 sm:h-80 md:h-[28rem] object-cover"
             />
           </div>
 
-          {/* Situation */}
-          <section className="mb-16">
-            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-4">
-              <Crosshair className="w-4 h-4" />
-              Situation
-            </div>
-            <p className="text-base leading-[1.8] text-foreground/80 max-w-2xl">
+          {/* 01 - Situation */}
+          <section className="mb-12">
+            <SectionHeader number="01" label="Situation" />
+            <p className="text-[15px] leading-[1.8] text-foreground/80 max-w-2xl">
               {project.situation}
             </p>
           </section>
 
-          {/* Task */}
-          <section className="mb-16">
-            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-4">
-              <ListChecks className="w-4 h-4" />
-              Task
-            </div>
-            <p className="text-base leading-[1.8] text-foreground/80 max-w-2xl">
+          <div className="h-px bg-border/40 mb-12" />
+
+          {/* 02 - Task */}
+          <section className="mb-12">
+            <SectionHeader number="02" label="Task" />
+            <p className="text-[15px] leading-[1.8] text-foreground/80 max-w-2xl">
               {project.task}
             </p>
           </section>
 
           {/* img1 */}
           {project.img1 && (
-            <div className="rounded-xl overflow-hidden mb-16 border border-border/30">
+            <div className="overflow-hidden mb-12">
               <img
                 src={project.img1}
                 alt={`${project.project_name} - 1`}
-                className="w-full h-64 sm:h-80 object-cover"
+                className="w-full h-56 sm:h-72 object-cover"
               />
             </div>
           )}
 
-          {/* Roles & Deliverables / Actions */}
-          <section className="mb-16">
-            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-6">
-              <Zap className="w-4 h-4" />
-              Roles & Deliverables
-            </div>
-            <div className="space-y-6">
+          <div className="h-px bg-border/40 mb-12" />
+
+          {/* 03 - Roles & Deliverables */}
+          <section className="mb-12">
+            <SectionHeader number="03" label="Roles & Deliverables" />
+            <div className="space-y-4">
               {actions.map((action, i) => (
-                <div key={i} className="pl-6 border-l-2 border-accent/20">
-                  <p className="text-base leading-[1.8] text-foreground/80">
+                <div key={i} className="flex items-start gap-4">
+                  <span className="text-[12px] font-mono font-semibold text-accent mt-0.5 w-5 shrink-0 text-right">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <p className="text-[15px] leading-[1.8] text-foreground/80">
                     {action}
                   </p>
                 </div>
@@ -174,17 +176,18 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* Impact */}
-          <section className="mb-16">
-            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-6">
-              <TrendingUp className="w-4 h-4" />
-              Impact
-            </div>
+          <div className="h-px bg-border/40 mb-12" />
+
+          {/* 04 - Impact */}
+          <section className="mb-12">
+            <SectionHeader number="04" label="Impact" />
             <div className="space-y-3">
               {impacts.map((item, i) => (
-                <div key={i} className="flex items-start gap-3 p-4 rounded-lg bg-accent/[0.06] border border-accent/15">
-                  <span className="mt-1.5 w-2 h-2 rounded-full bg-accent shrink-0" />
-                  <p className="text-base leading-[1.8] font-medium text-accent">
+                <div key={i} className="flex items-start gap-3 p-4 bg-accent/[0.06] border border-accent/15">
+                  <span className="flex items-center justify-center w-6 h-6 bg-accent text-accent-foreground text-[11px] font-mono font-bold shrink-0">
+                    {i + 1}
+                  </span>
+                  <p className="text-[15px] leading-[1.8] font-medium text-accent">
                     {item}
                   </p>
                 </div>
@@ -194,21 +197,20 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
           {/* img2 */}
           {project.img2 && (
-            <div className="rounded-xl overflow-hidden mb-16 border border-border/30">
+            <div className="overflow-hidden mb-12">
               <img
                 src={project.img2}
                 alt={`${project.project_name} - 2`}
-                className="w-full h-64 sm:h-80 object-cover"
+                className="w-full h-56 sm:h-72 object-cover"
               />
             </div>
           )}
 
-          {/* Result */}
+          <div className="h-px bg-border/40 mb-12" />
+
+          {/* 05 - Result */}
           <section className="mb-16">
-            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-accent/70 mb-4">
-              <Award className="w-4 h-4" />
-              Result
-            </div>
+            <SectionHeader number="05" label="Result" />
             <p className="text-base leading-[1.8] text-foreground/80 max-w-2xl">
               {project.result}
             </p>

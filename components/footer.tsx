@@ -1,4 +1,3 @@
-import { Mail, Linkedin } from 'lucide-react';
 import { ProfileStatic } from '@/lib/types';
 
 interface FooterProps {
@@ -9,30 +8,32 @@ export function Footer({ profile }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/30">
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
+    <footer className="border-t border-border/40">
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-[13px] font-medium text-foreground">
+            {profile.name}
+          </p>
+
+          <div className="flex items-center gap-6">
             <a
               href={`mailto:${profile.contact_email}`}
-              className="flex items-center justify-center w-9 h-9 rounded-full border border-border hover:border-accent/40 hover:bg-accent/[0.04] transition-all duration-300 text-muted-foreground hover:text-accent"
-              aria-label="Email"
+              className="text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200"
             >
-              <Mail className="w-4 h-4" />
+              Email
             </a>
             <a
               href={`https://${profile.linkedin_url}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center w-9 h-9 rounded-full border border-border hover:border-accent/40 hover:bg-accent/[0.04] transition-all duration-300 text-muted-foreground hover:text-accent"
-              aria-label="LinkedIn"
+              className="text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200"
             >
-              <Linkedin className="w-4 h-4" />
+              LinkedIn
             </a>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            &copy; {currentYear} {profile.name}. All rights reserved.
+          <p className="text-[12px] text-muted-foreground">
+            &copy; {currentYear}
           </p>
         </div>
       </div>
