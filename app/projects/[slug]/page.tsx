@@ -139,16 +139,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               <span className="text-muted-foreground">Industry</span>
               <span className="font-medium">{project.industry}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Briefcase className="w-3.5 h-3.5 text-accent/60" />
-              <span className="text-muted-foreground">Role</span>
-              <span className="font-medium">{project.role}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-3.5 h-3.5 text-accent/60" />
-              <span className="text-muted-foreground">Date</span>
-              <span className="font-medium">{project.date}</span>
-            </div>
             {phases.length > 0 && (
               <div className="flex items-center gap-2">
                 <Layers className="w-3.5 h-3.5 text-accent/60" />
@@ -165,6 +155,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 </div>
               </div>
             )}
+            <div className="flex items-center gap-2">
+              <Briefcase className="w-3.5 h-3.5 text-accent/60" />
+              <span className="text-muted-foreground">Role</span>
+              <span className="font-medium">{project.role}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5 text-accent/60" />
+              <span className="text-muted-foreground">Date</span>
+              <span className="font-medium">{project.date}</span>
+            </div>
           </div>
         </div>
 
@@ -296,16 +296,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       <span className="text-muted-foreground">Industry</span>
                       <span className="font-medium">{project.industry}</span>
                     </div>
-                    <div className="h-px bg-border/40" />
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Role</span>
-                      <span className="font-medium">{project.role}</span>
-                    </div>
-                    <div className="h-px bg-border/40" />
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Date</span>
-                      <span className="font-medium">{project.date}</span>
-                    </div>
                     {phases.length > 0 && (
                       <>
                         <div className="h-px bg-border/40" />
@@ -324,6 +314,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                         </div>
                       </>
                     )}
+                    <div className="h-px bg-border/40" />
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Role</span>
+                      <span className="font-medium">{project.role}</span>
+                    </div>
+                    <div className="h-px bg-border/40" />
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Date</span>
+                      <span className="font-medium">{project.date}</span>
+                    </div>
                   </div>
                 </div>
               </div>
