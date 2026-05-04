@@ -1,6 +1,6 @@
 import { fetchPortfolioData } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Briefcase, Calendar, Building2, Globe } from 'lucide-react';
 import { CTASection } from '@/components/cta-section';
 import { Footer } from '@/components/footer';
 import { Nav } from '@/components/nav';
@@ -12,6 +12,7 @@ import {
   slugify,
   getProjectTags,
   getProjectIndustries,
+  getAdjacentProjects,
 } from '@/lib/utils';
 import type { Metadata } from 'next';
 
@@ -41,8 +42,10 @@ export async function generateStaticParams() {
 function SectionHeader({ number, label }: { number: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="text-[11px] font-mono font-semibold text-accent tracking-wider">{number}</span>
-      <h3 className="text-[13px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
+      <span className="text-[11px] font-mono font-bold text-accent tracking-wider bg-accent/10 px-2 py-0.5 rounded">
+        {number}
+      </span>
+      <h3 className="text-[13px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
         {label}
       </h3>
     </div>
@@ -71,29 +74,31 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const hasActions = actions.length > 0 && actions[0] !== '';
   const hasImpacts = impacts.length > 0 && impacts[0] !== '';
   const hasAnyContent = hasSituation || hasTask || hasActions || hasImpacts || hasResult;
+  const { prev, next } = getAdjacentProjects(data.Dynamic, params.slug);
 
   return (
     <div className="min-h-screen bg-background">
       <Nav />
 
       <main className="pt-20 pb-16">
-        <div className="max-w-5xl mx-auto px-6">
-          {/* Back link */}
-          <a
-            href="/#projects"
-            className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200 mb-10 group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
-            All projects
-          </a>
+        {/* Full-width header */}
+        <div className="border-b border-border/30">
+          <div className="max-w-6xl mx-auto px-6 pt-10 pb-12">
+            {/* Back link */}
+            <a
+              href="/#projects"
+              className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200 mb-8 group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
+              All projects
+            </a>
 
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-2 mb-5">
+            {/* Tags row */}
+            <div className="flex flex-wrap gap-2 mb-6">
               {industries.map((ind) => (
                 <span
                   key={ind}
-                  className="text-[10px] px-2.5 py-1 font-semibold tracking-wider uppercase bg-accent/10 text-accent"
+                  className="text-[10px] px-3 py-1 font-bold tracking-wider uppercase bg-accent/10 text-accent rounded-full"
                 >
                   {ind}
                 </span>
@@ -101,171 +106,228 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="text-[10px] px-2.5 py-1 font-medium tracking-wider uppercase bg-secondary text-muted-foreground"
+                  className="text-[10px] px-3 py-1 font-medium tracking-wider uppercase bg-secondary text-muted-foreground rounded-full"
                 >
                   {tag}
                 </span>
               ))}
             </div>
 
-            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.05] mb-4">
+            {/* Title */}
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.05] mb-5">
               {project.project_name}
             </h1>
 
-            <p className="text-[15px] leading-[1.8] text-muted-foreground max-w-2xl">
+            <p className="text-[16px] leading-[1.7] text-muted-foreground max-w-2xl">
               {subtitle}
             </p>
           </div>
+        </div>
 
-          {/* Metadata row with dividers */}
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-12 py-5 border-y border-border/60 text-[13px]">
-            <div>
+        {/* Metadata bar */}
+        <div className="border-b border-border/30 bg-surface/50">
+          <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px]">
+            <div className="flex items-center gap-2">
+              <Building2 className="w-3.5 h-3.5 text-accent/60" />
               <span className="text-muted-foreground">Company</span>
-              <span className="ml-2 font-medium">{project.company}</span>
+              <span className="font-medium">{project.company}</span>
             </div>
-            <div className="hidden sm:block w-px h-4 bg-border/60" />
-            <div>
+            <div className="flex items-center gap-2">
+              <Globe className="w-3.5 h-3.5 text-accent/60" />
               <span className="text-muted-foreground">Industry</span>
-              <span className="ml-2 font-medium">{project.industry}</span>
+              <span className="font-medium">{project.industry}</span>
             </div>
-            <div className="hidden sm:block w-px h-4 bg-border/60" />
-            <div>
+            <div className="flex items-center gap-2">
+              <Briefcase className="w-3.5 h-3.5 text-accent/60" />
               <span className="text-muted-foreground">Role</span>
-              <span className="ml-2 font-medium">{project.role}</span>
+              <span className="font-medium">{project.role}</span>
             </div>
-            <div className="hidden sm:block w-px h-4 bg-border/60" />
-            <div>
+            <div className="flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5 text-accent/60" />
               <span className="text-muted-foreground">Duration</span>
-              <span className="ml-2 font-medium">{project.duration}</span>
+              <span className="font-medium">{project.duration}</span>
             </div>
           </div>
+        </div>
 
-          {/* Cover image - only if valid URL exists */}
+        {/* Content area: main + sidebar */}
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          {/* Cover image or placeholder banner */}
           {!hasImg1 && !hasImg2 && (
-            <div className="card-header-gradient mb-16 py-16 px-8 flex items-center justify-center">
-              <div className="text-center">
-                <p className="font-serif text-2xl sm:text-3xl text-foreground/30 mb-2">
+            <div className="card-header-gradient rounded-xl mb-12 py-20 px-8 flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 grid-bg opacity-30" />
+              <div className="relative text-center">
+                <p className="font-serif text-3xl sm:text-4xl text-foreground/15 mb-2">
                   {project.project_name}
                 </p>
-                <p className="text-[13px] text-muted-foreground/50">
+                <p className="text-[13px] text-muted-foreground/40">
                   {project.industry} &middot; {project.role}
                 </p>
               </div>
             </div>
           )}
 
-          {/* Content sections - only render if any real content exists */}
           {hasAnyContent && (
-            <>
-              {/* 01 - Situation */}
-              {hasSituation && (
-                <section className="mb-12">
-                  <SectionHeader number="01" label="Situation" />
-                  <p className="text-[15px] leading-[1.8] text-foreground/80 max-w-2xl">
-                    {project.situation}
-                  </p>
-                </section>
-              )}
+            <div className="grid lg:grid-cols-[1.4fr_1fr] gap-12">
+              {/* Left: Main narrative */}
+              <div>
+                {hasSituation && (
+                  <section className="mb-10">
+                    <SectionHeader number="01" label="Situation" />
+                    <p className="text-[15px] leading-[1.8] text-foreground/80">
+                      {project.situation}
+                    </p>
+                  </section>
+                )}
 
-              {hasSituation && <div className="h-px bg-border/40 mb-12" />}
+                {hasTask && (
+                  <section className="mb-10">
+                    <SectionHeader number="02" label="Task" />
+                    <p className="text-[15px] leading-[1.8] text-foreground/80">
+                      {project.task}
+                    </p>
+                  </section>
+                )}
 
-              {/* 02 - Task */}
-              {hasTask && (
-                <section className="mb-12">
-                  <SectionHeader number="02" label="Task" />
-                  <p className="text-[15px] leading-[1.8] text-foreground/80 max-w-2xl">
-                    {project.task}
-                  </p>
-                </section>
-              )}
-
-              {/* img1 */}
-              {hasImg1 && (
-                <div className="overflow-hidden mb-12">
-                  <img
-                    src={project.img1}
-                    alt={`${project.project_name} - 1`}
-                    className="w-full h-56 sm:h-72 object-cover"
-                  />
-                </div>
-              )}
-
-              {hasTask && <div className="h-px bg-border/40 mb-12" />}
-
-              {/* 03 - Roles & Deliverables */}
-              {hasActions && (
-                <section className="mb-12">
-                  <SectionHeader number="03" label="Roles & Deliverables" />
-                  <div className="space-y-4">
-                    {actions.map((action, i) => (
-                      <div key={i} className="flex items-start gap-4">
-                        <span className="text-[12px] font-mono font-semibold text-accent mt-0.5 w-5 shrink-0 text-right">
-                          {String(i + 1).padStart(2, '0')}
-                        </span>
-                        <p className="text-[15px] leading-[1.8] text-foreground/80">
-                          {action}
-                        </p>
-                      </div>
-                    ))}
+                {hasImg1 && (
+                  <div className="overflow-hidden rounded-lg mb-10">
+                    <img
+                      src={project.img1}
+                      alt={`${project.project_name} - 1`}
+                      className="w-full h-56 sm:h-72 object-cover"
+                    />
                   </div>
-                </section>
-              )}
+                )}
 
-              {hasActions && <div className="h-px bg-border/40 mb-12" />}
+                {hasActions && (
+                  <section className="mb-10">
+                    <SectionHeader number="03" label="Roles & Deliverables" />
+                    <div className="space-y-4">
+                      {actions.map((action, i) => (
+                        <div key={i} className="flex items-start gap-4">
+                          <span className="text-[12px] font-mono font-bold text-accent mt-0.5 w-6 shrink-0 text-right">
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <p className="text-[15px] leading-[1.8] text-foreground/80">
+                            {action}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
 
-              {/* 04 - Impact */}
-              {hasImpacts && (
-                <section className="mb-12">
-                  <SectionHeader number="04" label="Impact" />
-                  <div className="space-y-3">
-                    {impacts.map((item, i) => (
-                      <div key={i} className="flex items-start gap-3 p-4 bg-accent/[0.06] border border-accent/15">
-                        <span className="flex items-center justify-center w-6 h-6 bg-accent text-accent-foreground text-[11px] font-mono font-bold shrink-0">
-                          {i + 1}
-                        </span>
-                        <p className="text-[15px] leading-[1.8] font-medium text-accent">
-                          {item}
-                        </p>
-                      </div>
-                    ))}
+                {hasImg2 && (
+                  <div className="overflow-hidden rounded-lg mb-10">
+                    <img
+                      src={project.img2}
+                      alt={`${project.project_name} - 2`}
+                      className="w-full h-56 sm:h-72 object-cover"
+                    />
                   </div>
-                </section>
-              )}
+                )}
 
-              {/* img2 */}
-              {hasImg2 && (
-                <div className="overflow-hidden mb-12">
-                  <img
-                    src={project.img2}
-                    alt={`${project.project_name} - 2`}
-                    className="w-full h-56 sm:h-72 object-cover"
-                  />
-                </div>
-              )}
+                {hasResult && (
+                  <section className="mb-10">
+                    <SectionHeader number="05" label="Result" />
+                    <p className="text-[15px] leading-[1.8] text-foreground/80">
+                      {project.result}
+                    </p>
+                  </section>
+                )}
+              </div>
 
-              {hasImpacts && <div className="h-px bg-border/40 mb-12" />}
+              {/* Right: Sidebar */}
+              <div className="space-y-6">
+                {/* Impact cards */}
+                {hasImpacts && (
+                  <div className="glass rounded-xl p-5">
+                    <p className="text-[12px] font-semibold tracking-[0.15em] uppercase text-accent mb-4">
+                      Impact
+                    </p>
+                    <div className="space-y-3">
+                      {impacts.map((item, i) => (
+                        <div
+                          key={i}
+                          className="flex items-start gap-3 p-3 bg-accent/[0.06] border border-accent/15 rounded-lg"
+                        >
+                          <span className="flex items-center justify-center w-6 h-6 bg-accent text-accent-foreground text-[11px] font-mono font-bold shrink-0 rounded">
+                            {i + 1}
+                          </span>
+                          <p className="text-[14px] leading-[1.7] font-medium text-accent">
+                            {item}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-              {/* 05 - Result */}
-              {hasResult && (
-                <section className="mb-16">
-                  <SectionHeader number="05" label="Result" />
-                  <p className="text-base leading-[1.8] text-foreground/80 max-w-2xl">
-                    {project.result}
+                {/* Project info card */}
+                <div className="glass rounded-xl p-5">
+                  <p className="text-[12px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mb-4">
+                    Details
                   </p>
-                </section>
-              )}
-            </>
+                  <div className="space-y-3 text-[13px]">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Company</span>
+                      <span className="font-medium text-right max-w-[60%]">{project.company}</span>
+                    </div>
+                    <div className="h-px bg-border/40" />
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Industry</span>
+                      <span className="font-medium">{project.industry}</span>
+                    </div>
+                    <div className="h-px bg-border/40" />
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Role</span>
+                      <span className="font-medium">{project.role}</span>
+                    </div>
+                    <div className="h-px bg-border/40" />
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Duration</span>
+                      <span className="font-medium">{project.duration}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
+        </div>
 
-          {/* Navigation back */}
-          <div className="pt-8 border-t border-border/40">
+        {/* Previous / Next navigation */}
+        <div className="border-t border-border/30">
+          <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
+            {prev ? (
+              <a
+                href={`/projects/${slugify(prev.project_name)}`}
+                className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200 group"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5" />
+                <span className="max-w-[200px] truncate">{prev.project_name}</span>
+              </a>
+            ) : (
+              <span />
+            )}
+
             <a
               href="/#projects"
-              className="inline-flex items-center gap-2 text-[13px] text-accent font-medium hover:underline transition-all duration-200"
+              className="text-[12px] text-muted-foreground hover:text-accent transition-colors duration-200"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Back to all projects
+              All projects
             </a>
+
+            {next ? (
+              <a
+                href={`/projects/${slugify(next.project_name)}`}
+                className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200 group"
+              >
+                <span className="max-w-[200px] truncate">{next.project_name}</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </a>
+            ) : (
+              <span />
+            )}
           </div>
         </div>
       </main>

@@ -15,7 +15,7 @@ export default async function Home() {
     <div className="min-h-screen bg-background">
       <Nav />
       <main>
-        <Hero profile={profile} />
+        <Hero profile={profile} projects={projects} />
         <ProjectSection projects={projects} />
         <AboutSection profile={profile} projects={projects} />
         <CTASection profile={profile} projects={projects} />

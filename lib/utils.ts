@@ -120,3 +120,31 @@ export function getProjectIndustries(project: Project): string[] {
   if (!project.industry) return [];
   return project.industry.split('/').map((i) => i.trim()).filter(Boolean);
 }
+
+export interface ProfileStats {
+  yearsProduct: number;
+  yearsLeadership: string;
+  domainCount: number;
+  industryCount: number;
+}
+
+export function parseProfileStats(summary: string, projects: Project[]): ProfileStats {
+  const productMatch = summary.match(/(\d+)\s*yrs?\s*Product/i);
+  const leadershipMatch = summary.match(/(\d+\+?)\s*yrs?\s*Leadership/i);
+
+  return {
+    yearsProduct: productMatch ? parseInt(productMatch[1], 10) : 8,
+    yearsLeadership: leadershipMatch ? leadershipMatch[1] : '4+',
+    domainCount: extractDomains(summary, projects).length,
+    industryCount: extractIndustries(projects).length,
+  };
+}
+
+export function getAdjacentProjects(projects: Project[], currentSlug: string): { prev?: Project; next?: Project } {
+  const slugs = projects.map((p) => slugify(p.project_name));
+  const currentIndex = slugs.indexOf(currentSlug);
+  return {
+    prev: currentIndex > 0 ? projects[currentIndex - 1] : undefined,
+    next: currentIndex < projects.length - 1 ? projects[currentIndex + 1] : undefined,
+  };
+}
