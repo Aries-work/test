@@ -75,7 +75,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             </span>
             <span className="flex items-center gap-1.5">
               <Calendar className="w-3 h-3 text-accent/50" />
-              {project.duration}
+              {project.date}
             </span>
           </div>
 

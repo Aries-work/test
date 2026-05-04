@@ -121,6 +121,11 @@ export function getProjectIndustries(project: Project): string[] {
   return project.industry.split('/').map((i) => i.trim()).filter(Boolean);
 }
 
+export function getProjectPhases(project: Project): string[] {
+  if (!project.phase || !Array.isArray(project.phase)) return [];
+  return project.phase.filter((p) => p && p.trim());
+}
+
 export interface ProfileStats {
   yearsProduct: number;
   yearsLeadership: string;

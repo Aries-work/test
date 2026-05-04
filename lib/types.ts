@@ -13,7 +13,8 @@ export interface Project {
   company: string;
   industry: string;
   role: string;
-  duration: string;
+  date: string;
+  phase?: string[];
   short_description?: string;
   situation?: string;
   task?: string;

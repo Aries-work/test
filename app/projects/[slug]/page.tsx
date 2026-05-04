@@ -1,6 +1,6 @@
 import { fetchPortfolioData } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Briefcase, Calendar, Building2, Globe } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Briefcase, Calendar, Building2, Globe, Layers } from 'lucide-react';
 import { CTASection } from '@/components/cta-section';
 import { Footer } from '@/components/footer';
 import { Nav } from '@/components/nav';
@@ -12,6 +12,7 @@ import {
   slugify,
   getProjectTags,
   getProjectIndustries,
+  getProjectPhases,
   getAdjacentProjects,
 } from '@/lib/utils';
 import type { Metadata } from 'next';
@@ -63,6 +64,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   const tags = getProjectTags(project);
   const industries = getProjectIndustries(project);
+  const phases = getProjectPhases(project);
   const actions = parseQuotedList(project.actions);
   const impacts = parseQuotedList(project.impact);
   const subtitle = getProjectSubtitle(project);
@@ -144,9 +146,25 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="w-3.5 h-3.5 text-accent/60" />
-              <span className="text-muted-foreground">Duration</span>
-              <span className="font-medium">{project.duration}</span>
+              <span className="text-muted-foreground">Date</span>
+              <span className="font-medium">{project.date}</span>
             </div>
+            {phases.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Layers className="w-3.5 h-3.5 text-accent/60" />
+                <span className="text-muted-foreground">Phase</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {phases.map((phase) => (
+                    <span
+                      key={phase}
+                      className="text-[11px] px-2.5 py-0.5 font-semibold tracking-wide uppercase bg-accent/10 text-accent border border-accent/20 rounded-full"
+                    >
+                      {phase}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -285,9 +303,27 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                     </div>
                     <div className="h-px bg-border/40" />
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Duration</span>
-                      <span className="font-medium">{project.duration}</span>
+                      <span className="text-muted-foreground">Date</span>
+                      <span className="font-medium">{project.date}</span>
                     </div>
+                    {phases.length > 0 && (
+                      <>
+                        <div className="h-px bg-border/40" />
+                        <div>
+                          <span className="text-muted-foreground">Phase</span>
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {phases.map((phase) => (
+                              <span
+                                key={phase}
+                                className="text-[11px] px-2.5 py-0.5 font-semibold tracking-wide uppercase bg-accent/10 text-accent border border-accent/20 rounded-full"
+                              >
+                                {phase}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

@@ -17,7 +17,7 @@ export function AboutSection({ profile, projects }: AboutSectionProps) {
   const experiences = projects.map((p) => ({
     company: p.company,
     role: p.role,
-    duration: p.duration,
+    date: p.date,
     industry: p.industry,
     impact: p.impact,
   }));
@@ -128,7 +128,7 @@ export function AboutSection({ profile, projects }: AboutSectionProps) {
                         <p className="text-[12px] text-muted-foreground mb-2">
                           {exp.role}
                           <span className="mx-1.5 text-border">|</span>
-                          {exp.duration}
+                          {exp.date}
                           <span className="mx-1.5 text-border">|</span>
                           {exp.industry}
                         </p>
