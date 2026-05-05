@@ -17,7 +17,7 @@ export default async function Home() {
   const profile: Profile = (data && data.Static && data.Static.length > 0)
    ? data.Static.at(0)
     : {
-        name: "Aries L",
+        name: "Aries Liu",
         headline: "I Build the [Right] Thing, then [Scale It].",
         titles: "Product Owner, Project Lead, AI Builder",
         summary: "Product Leader (8 yrs Product, 4+ yrs Leadership) across FinTech (Payments/Crypto), Gaming, MarTech, and Healthcare. Combining design excellence with data-driven strategies to integrate complex SaaS, ERP, and Mobile.",
