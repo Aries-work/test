@@ -230,3 +230,63 @@ export function isValidImageUrl(url?: string): boolean {
     return false;
   }
 }
+
+/* -----------------------------
+   Profile & Aggregation Helpers
+------------------------------ */
+
+export function parseProfileStats(summary: string, projects: Project[]) {
+  // 嘗試從 summary 中擷取年資，若無則預設為 8+ 與 4+
+  const productMatch = summary.match(/(\d+)\+?\s*years[^\.]*product/i);
+  const leadMatch = summary.match(/(\d+)\+?\s*years[^\.]*leadership/i);
+
+  const yearsProduct = productMatch ? `${productMatch[1]}+` : "8+";
+  const yearsLeadership = leadMatch ? `${leadMatch[1]}+` : "4+";
+
+  const domains = extractDomains(summary, projects);
+  const industries = extractIndustries(projects);
+
+  return {
+    yearsProduct,
+    yearsLeadership,
+    domainCount: domains.length.toString(),
+    industryCount: industries.length.toString(),
+  };
+}
+
+export function extractDomains(summary: string, projects: Project[]): string[] {
+  const domains = new Set<string>();
+  
+  // 從所有專案的 Tags 中提取不重複的領域
+  projects.forEach((p) => {
+    getProjectTags(p).forEach((tag) => domains.add(tag));
+  });
+  
+  return Array.from(domains);
+}
+
+export function groupProjectsByCompany(projects: Project[]): Map<string, Project[]> {
+  const groups = new Map<string, Project[]>();
+  
+  // 將專案依照公司名稱進行分組
+  projects.forEach((project) => {
+    const company = project.company || "Independent";
+    if (!groups.has(company)) {
+      groups.set(company, []);
+    }
+    groups.get(company)!.push(project);
+  });
+  
+  return groups;
+}
+
+export function extractIndustries(projects: Project[]): string[] {
+  const industries = new Set<string>();
+  
+  // 從所有專案的 industry 中提取不重複的產業
+  projects.forEach((p) => {
+    getProjectIndustries(p).forEach((ind) => industries.add(ind));
+  });
+  
+  return Array.from(industries);
+}
