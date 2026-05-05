@@ -21,12 +21,13 @@ export interface Project {
   actions?: string;
   impact?: string;
   result?: string;
-  img1?: string; // Kept for backward compatibility
-  img2?: string; // Kept for backward compatibility
+  img1?: string; 
+  img2?: string; 
   
-  // New dynamic image schema
+  // Dynamic image schema
   img_situation?: string[];
   img_task?: string[];
+  img_actions?: string[]; // <-- Added img_actions
   img_result?: string[];
   img_project?: string[];
 }
