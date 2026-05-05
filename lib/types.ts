@@ -21,8 +21,14 @@ export interface Project {
   actions?: string;
   impact?: string;
   result?: string;
-  img1?: string;
-  img2?: string;
+  img1?: string; // Kept for backward compatibility
+  img2?: string; // Kept for backward compatibility
+  
+  // New dynamic image schema
+  img_situation?: string[];
+  img_task?: string[];
+  img_result?: string[];
+  img_project?: string[];
 }
 
 export interface PortfolioData {
