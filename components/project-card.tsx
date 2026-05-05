@@ -15,7 +15,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
   const industries = getProjectIndustries(project);
 
   return (
-    <Link href={`/projects/${slug}`} className="group block">
+    <Link href={`/projects/${slug}`} className="group block h-full">
       <div className="relative bg-card border border-border/50 rounded-xl hover-lift h-full flex flex-col sm:flex-row overflow-hidden accent-border-left">
         {/* Left: Visual block with industry watermark */}
         <div className="relative sm:w-44 md:w-52 shrink-0 card-header-gradient p-5 flex flex-col justify-between min-h-[120px] sm:min-h-0">
