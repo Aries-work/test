@@ -4,12 +4,12 @@ import { ArrowLeft, ArrowRight, Briefcase, Calendar, Building2, Globe, Layers } 
 import { CTASection } from '@/components/cta-section';
 import { Footer } from '@/components/footer';
 import { Nav } from '@/components/nav';
+import { SectionImages } from '@/components/section-images';
 import {
   parseQuotedList,
   parseLabeledText,
   isPlaceholder,
   getProjectSubtitle,
-  isValidImageUrl,
   slugify,
   getProjectTags,
   getProjectIndustries,
@@ -86,8 +86,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const actions = parseQuotedList(project.actions);
   const impacts = parseQuotedList(project.impact);
   const subtitle = getProjectSubtitle(project);
-  const hasImg1 = isValidImageUrl(project.img1);
-  const hasImg2 = isValidImageUrl(project.img2);
+  
   const hasSituation = !isPlaceholder(project.situation);
   const hasTask = !isPlaceholder(project.task);
   const hasResult = !isPlaceholder(project.result);
@@ -95,6 +94,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const hasImpacts = impacts.length > 0 && impacts[0] !== '';
   const hasAnyContent = hasSituation || hasTask || hasActions || hasImpacts || hasResult;
   const { prev, next } = getAdjacentProjects(data.Dynamic, params.slug);
+
+  const hasProjectCover = project.img_project && project.img_project.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -104,7 +105,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         {/* Full-width header */}
         <div className="border-b border-border/30">
           <div className="max-w-6xl mx-auto px-6 pt-10 pb-12">
-            {/* Back link */}
             <a
               href="/#projects"
               className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200 mb-8 group"
@@ -113,7 +113,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               All projects
             </a>
 
-            {/* Tags row */}
             <div className="flex flex-wrap gap-2 mb-6">
               {industries.map((ind) => (
                 <span
@@ -133,7 +132,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               ))}
             </div>
 
-            {/* Title */}
             <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.05] mb-5">
               {project.project_name}
             </h1>
@@ -188,9 +186,17 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
         {/* Content area: main + sidebar */}
         <div className="max-w-6xl mx-auto px-6 py-12">
-          {/* Cover image or placeholder banner */}
-          {!hasImg1 && !hasImg2 && (
-            <div className="card-header-gradient rounded-xl mb-12 py-20 px-8 flex items-center justify-center relative overflow-hidden">
+          
+          {hasProjectCover ? (
+            <div className="mb-12 rounded-xl overflow-hidden bg-surface/10 flex items-center justify-center border border-border/20">
+              <img
+                src={project.img_project![0]}
+                alt={`${project.project_name} cover`}
+                className="w-full h-auto max-h-[60vh] object-contain"
+              />
+            </div>
+          ) : (
+            <div className="card-header-gradient rounded-xl mb-12 py-20 px-8 flex items-center justify-center relative overflow-hidden border border-border/20">
               <div className="absolute inset-0 grid-bg opacity-30" />
               <div className="relative text-center">
                 <p className="font-serif text-3xl sm:text-4xl text-foreground/15 mb-2">
@@ -213,6 +219,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                     <p className="text-[15px] leading-[1.8] text-foreground/80">
                       {project.situation}
                     </p>
+                    <SectionImages 
+                      images={project.img_situation} 
+                      altPrefix={`${project.project_name} Situation`} 
+                    />
                   </section>
                 )}
 
@@ -222,17 +232,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                     <p className="text-[15px] leading-[1.8] text-foreground/80">
                       {project.task}
                     </p>
-                  </section>
-                )}
-
-                {hasImg1 && (
-                  <div className="overflow-hidden rounded-lg mb-10">
-                    <img
-                      src={project.img1}
-                      alt={`${project.project_name} - 1`}
-                      className="w-full h-56 sm:h-72 object-cover"
+                    <SectionImages 
+                      images={project.img_task} 
+                      altPrefix={`${project.project_name} Task`} 
                     />
-                  </div>
+                  </section>
                 )}
 
                 {hasActions && (
@@ -250,22 +254,17 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                         </div>
                       ))}
                     </div>
-                  </section>
-                )}
-
-                {hasImg2 && (
-                  <div className="overflow-hidden rounded-lg mb-10">
-                    <img
-                      src={project.img2}
-                      alt={`${project.project_name} - 2`}
-                      className="w-full h-56 sm:h-72 object-cover"
+                    {/* Render dynamic Actions images */}
+                    <SectionImages 
+                      images={project.img_actions} 
+                      altPrefix={`${project.project_name} Actions`} 
                     />
-                  </div>
+                  </section>
                 )}
 
                 {hasResult && (
                   <section className="mb-10">
-                    <SectionHeader number="05" label="Result" />
+                    <SectionHeader number="04" label="Result" />
                     <div className="space-y-4">
                       {parseQuotedList(project.result).map((para, i) => (
                         <p key={i} className="text-[15px] leading-[1.8] text-foreground/80">
@@ -273,13 +272,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                         </p>
                       ))}
                     </div>
+                    <SectionImages 
+                      images={project.img_result} 
+                      altPrefix={`${project.project_name} Result`} 
+                    />
                   </section>
                 )}
               </div>
 
               {/* Right: Sidebar */}
               <div className="space-y-6">
-                {/* Impact cards */}
                 {hasImpacts && (
                   <div className="glass rounded-xl p-5">
                     <p className="text-[12px] font-semibold tracking-[0.15em] uppercase text-accent mb-4">
@@ -303,7 +305,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   </div>
                 )}
 
-                {/* Project info card */}
                 <div className="glass rounded-xl p-5">
                   <p className="text-[12px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mb-4">
                     Details
