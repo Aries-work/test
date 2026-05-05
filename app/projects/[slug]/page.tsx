@@ -60,7 +60,7 @@ function LabeledText({ text }: { text: string }) {
     <>
       {segments.map((seg, i) =>
         seg.bold ? (
-          <strong key={i} className="font-semibold text-foreground">
+          <strong key={i} className="font-semibold">
             {seg.text}
           </strong>
         ) : (
