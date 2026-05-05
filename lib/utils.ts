@@ -32,6 +32,32 @@ export function parseBracketText(text: string): BracketSegment[] {
   return segments;
 }
 
+export interface LabeledTextSegment {
+  text: string;
+  bold: boolean;
+}
+
+export function parseLabeledText(text: string): LabeledTextSegment[] {
+  const segments: LabeledTextSegment[] = [];
+  const regex = /\[([^\]]+)\]/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      segments.push({ text: text.slice(lastIndex, match.index), bold: false });
+    }
+    segments.push({ text: match[1], bold: true });
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    segments.push({ text: text.slice(lastIndex), bold: false });
+  }
+
+  return segments;
+}
+
 export function parseQuotedList(text: string | undefined): string[] {
   if (!text) return [];
   const matches = text.match(/"([^"]*)"/g);
@@ -122,8 +148,8 @@ export function getProjectIndustries(project: Project): string[] {
 }
 
 export function getProjectPhases(project: Project): string[] {
-  if (!project.phase || !Array.isArray(project.phase)) return [];
-  return project.phase.filter((p) => p && p.trim());
+  if (!project.phase || !project.phase.trim()) return [];
+  return project.phase.split(',').map((p) => p.trim()).filter(Boolean);
 }
 
 export interface ProfileStats {

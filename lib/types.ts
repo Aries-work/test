@@ -14,7 +14,7 @@ export interface Project {
   industry: string;
   role: string;
   date: string;
-  phase?: string[];
+  phase?: string;
   short_description?: string;
   situation?: string;
   task?: string;

@@ -6,6 +6,7 @@ import { Footer } from '@/components/footer';
 import { Nav } from '@/components/nav';
 import {
   parseQuotedList,
+  parseLabeledText,
   isPlaceholder,
   getProjectSubtitle,
   isValidImageUrl,
@@ -50,6 +51,23 @@ function SectionHeader({ number, label }: { number: string; label: string }) {
         {label}
       </h3>
     </div>
+  );
+}
+
+function LabeledText({ text }: { text: string }) {
+  const segments = parseLabeledText(text);
+  return (
+    <>
+      {segments.map((seg, i) =>
+        seg.bold ? (
+          <strong key={i} className="font-semibold text-foreground">
+            {seg.text}
+          </strong>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        )
+      )}
+    </>
   );
 }
 
@@ -227,7 +245,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                             {String(i + 1).padStart(2, '0')}
                           </span>
                           <p className="text-[15px] leading-[1.8] text-foreground/80">
-                            {action}
+                            <LabeledText text={action} />
                           </p>
                         </div>
                       ))}
@@ -248,9 +266,13 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 {hasResult && (
                   <section className="mb-10">
                     <SectionHeader number="05" label="Result" />
-                    <p className="text-[15px] leading-[1.8] text-foreground/80">
-                      {project.result}
-                    </p>
+                    <div className="space-y-4">
+                      {parseQuotedList(project.result).map((para, i) => (
+                        <p key={i} className="text-[15px] leading-[1.8] text-foreground/80">
+                          <LabeledText text={para} />
+                        </p>
+                      ))}
+                    </div>
                   </section>
                 )}
               </div>
@@ -272,8 +294,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                           <span className="flex items-center justify-center w-6 h-6 bg-accent text-accent-foreground text-[11px] font-mono font-bold shrink-0 rounded">
                             {i + 1}
                           </span>
-                          <p className="text-[14px] leading-[1.7] font-medium text-accent">
-                            {item}
+                          <p className="text-[14px] leading-[1.7] text-accent">
+                            <LabeledText text={item} />
                           </p>
                         </div>
                       ))}
