@@ -24,19 +24,24 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const data = await fetchPortfolioData();
-  const project = data.Dynamic.find((p) => slugify(p.project_name) === params.slug);
+  const project = data?.Dynamic?.find((p: any) => slugify(p.project_name) === params.slug);
   if (!project) return { title: 'Project Not Found' };
   return {
     title: `${project.project_name} | Aries Liu`,
     description: isPlaceholder(project.short_description)
-      ? `${project.role} at ${project.company} - ${project.industry}`
-      : project.short_description || `${project.role} at ${project.company}`,
+     ? `${project.role} at ${project.company} - ${project.industry}`
+      : project.short_description |
+
+| `${project.role} at ${project.company}`,
   };
 }
 
 export async function generateStaticParams() {
   const data = await fetchPortfolioData();
-  return data.Dynamic.map((project) => ({
+  // 防呆：確保 Dynamic 有資料，否則回傳空陣列避免.map 報錯
+  if (!data?.Dynamic ||!Array.isArray(data.Dynamic)) return;
+  
+  return data.Dynamic.map((project: any) => ({
     slug: slugify(project.project_name),
   }));
 }
@@ -56,10 +61,12 @@ function SectionHeader({ number, label }: { number: string; label: string }) {
 
 function LabeledText({ text }: { text: string }) {
   const segments = parseLabeledText(text);
+  // 防呆：確保 segments 絕對是陣列
+  const safeSegments = Array.isArray(segments)? segments :;
   return (
     <>
-      {segments.map((seg, i) =>
-        seg.bold ? (
+      {safeSegments.map((seg: any, i: number) =>
+        seg.bold? (
           <strong key={i} className="font-semibold">
             {seg.text}
           </strong>
@@ -71,31 +78,60 @@ function LabeledText({ text }: { text: string }) {
   );
 }
 
+// 【修復核心 1】輔助函數：將從 Google Sheets 來的圖片字串安全轉換為陣列
+const parseImages = (imgData: any) => {
+  if (!imgData) return;
+  if (Array.isArray(imgData)) return imgData;
+  if (typeof imgData === 'string') return imgData.split(',').map(s => s.trim()).filter(Boolean);
+  return;
+};
+
+// 【修復核心 2】輔助函數：保證回傳的一定是陣列
+const safeArray = (data: any) => (Array.isArray(data)? data :);
+
 export default async function ProjectDetailPage({ params }: PageProps) {
   const data = await fetchPortfolioData();
-  const project = data.Dynamic.find((p) => slugify(p.project_name) === params.slug);
-  const profile = data.Static[0];
+  const project = data?.Dynamic?.find((p: any) => slugify(p.project_name) === params.slug);
+  const profile = data?.Static?. |
+
+| {};
 
   if (!project) {
     notFound();
   }
 
-  const tags = getProjectTags(project);
-  const industries = getProjectIndustries(project);
-  const phases = getProjectPhases(project);
-  const actions = parseQuotedList(project.actions);
-  const impacts = parseQuotedList(project.impact);
+  // 安全解析所有陣列，避免 undefined 引發.map 錯誤
+  const tags = safeArray(getProjectTags(project));
+  const industries = safeArray(getProjectIndustries(project));
+  const phases = safeArray(getProjectPhases(project));
+  const actions = safeArray(parseQuotedList(project.actions));
+  const impacts = safeArray(parseQuotedList(project.impact));
+  const results = safeArray(parseQuotedList(project.result));
   const subtitle = getProjectSubtitle(project);
   
-  const hasSituation = !isPlaceholder(project.situation);
-  const hasTask = !isPlaceholder(project.task);
-  const hasResult = !isPlaceholder(project.result);
-  const hasActions = actions.length > 0 && actions[0] !== '';
-  const hasImpacts = impacts.length > 0 && impacts[0] !== '';
-  const hasAnyContent = hasSituation || hasTask || hasActions || hasImpacts || hasResult;
-  const { prev, next } = getAdjacentProjects(data.Dynamic, params.slug);
+  const hasSituation =!isPlaceholder(project.situation);
+  const hasTask =!isPlaceholder(project.task);
+  const hasResult =!isPlaceholder(project.result);
+  const hasActions = actions.length > 0 && actions!== '';
+  const hasImpacts = impacts.length > 0 && impacts!== '';
+  const hasAnyContent = hasSituation |
 
-  const hasProjectCover = project.img_project && project.img_project.length > 0;
+| hasTask |
+| hasActions |
+| hasImpacts |
+| hasResult;
+  
+  const { prev, next } = getAdjacentProjects(data.Dynamic ||, params.slug);
+
+  // 統一處理圖片欄位，從字串轉為陣列
+  const imgProject = parseImages(project.img_project);
+  const imgSituation = parseImages(project.img_situation);
+  const imgTask = parseImages(project.img_task);
+  const imgActions = parseImages(project.img_actions);
+  const imgResult = parseImages(project.img_result);
+  const imgImpact = parseImages(project.img_impact);
+
+  const hasProjectCover = imgProject.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,7 +150,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </a>
 
             <div className="flex flex-wrap gap-2 mb-6">
-              {industries.map((ind) => (
+              {industries.map((ind: string) => (
                 <span
                   key={ind}
                   className="text-[10px] px-3 py-1 font-bold tracking-wider uppercase bg-accent/10 text-accent rounded-full"
@@ -122,7 +158,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   {ind}
                 </span>
               ))}
-              {tags.map((tag) => (
+              {tags.map((tag: string) => (
                 <span
                   key={tag}
                   className="text-[10px] px-3 py-1 font-medium tracking-wider uppercase bg-secondary text-muted-foreground rounded-full"
@@ -160,7 +196,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 <Layers className="w-3.5 h-3.5 text-accent/60" />
                 <span className="text-muted-foreground">Phase</span>
                 <div className="flex flex-wrap gap-1.5">
-                  {phases.map((phase) => (
+                  {phases.map((phase: string) => (
                     <span
                       key={phase}
                       className="text-[11px] px-2.5 py-0.5 font-semibold tracking-wide uppercase bg-accent/10 text-accent border border-accent/20 rounded-full"
@@ -187,10 +223,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         {/* Content area: main + sidebar */}
         <div className="max-w-6xl mx-auto px-6 py-12">
           
-          {hasProjectCover ? (
+          {hasProjectCover? (
             <div className="mb-12 rounded-xl overflow-hidden bg-surface/10 flex items-center justify-center border border-border/20">
               <img
-                src={project.img_project![0]}
+                src={imgProject}
                 alt={`${project.project_name} cover`}
                 className="w-full h-auto max-h-[60vh] object-contain"
               />
@@ -220,7 +256,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       {project.situation}
                     </p>
                     <SectionImages 
-                      images={project.img_situation} 
+                      images={imgSituation} 
                       altPrefix={`${project.project_name} Situation`} 
                     />
                   </section>
@@ -233,7 +269,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       {project.task}
                     </p>
                     <SectionImages 
-                      images={project.img_task} 
+                      images={imgTask} 
                       altPrefix={`${project.project_name} Task`} 
                     />
                   </section>
@@ -243,7 +279,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   <section className="mb-10">
                     <SectionHeader number="03" label="Roles & Deliverables" />
                     <div className="space-y-4">
-                      {actions.map((action, i) => (
+                      {actions.map((action: string, i: number) => (
                         <div key={i} className="flex items-start gap-4">
                           <span className="text-[12px] font-mono font-bold text-accent mt-0.5 w-6 shrink-0 text-right">
                             {String(i + 1).padStart(2, '0')}
@@ -256,7 +292,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                     </div>
                     {/* Render dynamic Actions images */}
                     <SectionImages 
-                      images={project.img_actions} 
+                      images={imgActions} 
                       altPrefix={`${project.project_name} Actions`} 
                     />
                   </section>
@@ -266,14 +302,14 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   <section className="mb-10">
                     <SectionHeader number="04" label="Result" />
                     <div className="space-y-4">
-                      {parseQuotedList(project.result).map((para, i) => (
+                      {results.map((para: string, i: number) => (
                         <p key={i} className="text-[15px] leading-[1.8] text-foreground/80">
                           <LabeledText text={para} />
                         </p>
                       ))}
                     </div>
                     <SectionImages 
-                      images={project.img_result} 
+                      images={imgResult} 
                       altPrefix={`${project.project_name} Result`} 
                     />
                   </section>
@@ -288,7 +324,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       Impact
                     </p>
                     <div className="space-y-3">
-                      {impacts.map((item, i) => (
+                      {impacts.map((item: string, i: number) => (
                         <div
                           key={i}
                           className="flex items-start gap-3 p-3 bg-accent/[0.06] border border-accent/15 rounded-lg"
@@ -325,7 +361,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                         <div>
                           <span className="text-muted-foreground">Phase</span>
                           <div className="flex flex-wrap gap-1.5 mt-2">
-                            {phases.map((phase) => (
+                            {phases.map((phase: string) => (
                               <span
                                 key={phase}
                                 className="text-[11px] px-2.5 py-0.5 font-semibold tracking-wide uppercase bg-accent/10 text-accent border border-accent/20 rounded-full"
@@ -357,7 +393,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         {/* Previous / Next navigation */}
         <div className="border-t border-border/30">
           <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
-            {prev ? (
+            {prev? (
               <a
                 href={`/projects/${slugify(prev.project_name)}`}
                 className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200 group"
@@ -376,7 +412,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               All projects
             </a>
 
-            {next ? (
+            {next? (
               <a
                 href={`/projects/${slugify(next.project_name)}`}
                 className="inline-flex items-center gap-2 text-[13px] text-muted-foreground hover:text-accent transition-colors duration-200 group"
@@ -391,7 +427,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         </div>
       </main>
 
-      <CTASection profile={profile} projects={data.Dynamic} />
+      <CTASection profile={profile} projects={data?.Dynamic ||} />
       <Footer profile={profile} />
     </div>
   );
