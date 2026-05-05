@@ -1,24 +1,24 @@
 import { z } from "zod";
 
 /* -----------------------------
-   Project Schema (核心)
+   Project Schema (CORE FIXED)
 ------------------------------ */
 
 export const ProjectSchema = z.object({
-  project_name: z.string().optional().default("Untitled Project"),
-  company: z.string().optional().default("Unknown"),
-  industry: z.string().optional().default(""),
-  role: z.string().optional().default(""),
-  date: z.string().optional().default(""),
+  project_name: z.coerce.string().optional().default("Untitled Project"),
+  company: z.coerce.string().optional().default("Unknown"),
+  industry: z.coerce.string().optional().default(""),
+  role: z.coerce.string().optional().default(""),
+  date: z.coerce.string().optional().default(""),
 
-  short_description: z.string().optional().nullable(),
+  short_description: z.coerce.string().optional().nullable(),
 
-  situation: z.string().optional().nullable(),
-  task: z.string().optional().nullable(),
-  result: z.string().optional().nullable(),
+  situation: z.coerce.string().optional().nullable(),
+  task: z.coerce.string().optional().nullable(),
+  result: z.coerce.string().optional().nullable(),
 
-  Tags: z.string().optional().nullable(),
-  phase: z.string().optional().nullable(),
+  Tags: z.coerce.string().optional().nullable(),
+  phase: z.coerce.string().optional().nullable(),
 
   img_project: z.union([z.string(), z.array(z.string())]).optional(),
   img_situation: z.union([z.string(), z.array(z.string())]).optional(),
@@ -37,7 +37,7 @@ export const PortfolioSchema = z.object({
 });
 
 /* -----------------------------
-   Safe parser (核心防炸)
+   Safe parser (NO BUILD CRASH)
 ------------------------------ */
 
 export function parsePortfolio(data: unknown) {
@@ -45,6 +45,7 @@ export function parsePortfolio(data: unknown) {
 
   if (!result.success) {
     console.warn("Schema validation failed:", result.error.flatten());
+
     return {
       Dynamic: [],
       Static: [],
