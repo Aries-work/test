@@ -18,28 +18,36 @@ import {
 } from '@/lib/utils';
 import type { Metadata } from 'next';
 
-interface PageProps {
-  params: { slug: string };
-}
+// 【修復 1】Next.js 15 規定 params 必須是 Promise
+type PageProps = {
+  params: Promise<{ slug: string }>;
+};
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
   const data = await fetchPortfolioData();
-  const project = data?.Dynamic?.find((p: any) => slugify(p.project_name) === params.slug);
+  
+  // 【修復 2】完全避開 |
+
+| 符號，改用三元運算子防呆
+  const project = data?.Dynamic? data.Dynamic.find((p: any) => slugify(p.project_name) === slug) : null;
+  
   if (!project) return { title: 'Project Not Found' };
+
+  const desc = project.short_description? project.short_description : `${project.role} at ${project.company}`;
+
   return {
     title: `${project.project_name} | Aries Liu`,
     description: isPlaceholder(project.short_description)
      ? `${project.role} at ${project.company} - ${project.industry}`
-      : project.short_description |
-
-| `${project.role} at ${project.company}`,
+      : desc,
   };
 }
 
 export async function generateStaticParams() {
   const data = await fetchPortfolioData();
-  // 防呆：確保 Dynamic 有資料，否則回傳空陣列避免.map 報錯
-  if (!data?.Dynamic ||!Array.isArray(data.Dynamic)) return;
+  if (!data?.Dynamic) return new Array();
+  if (!Array.isArray(data.Dynamic)) return new Array();
   
   return data.Dynamic.map((project: any) => ({
     slug: slugify(project.project_name),
@@ -61,8 +69,7 @@ function SectionHeader({ number, label }: { number: string; label: string }) {
 
 function LabeledText({ text }: { text: string }) {
   const segments = parseLabeledText(text);
-  // 防呆：確保 segments 絕對是陣列
-  const safeSegments = Array.isArray(segments)? segments :;
+  const safeSegments = Array.isArray(segments)? segments : new Array();
   return (
     <>
       {safeSegments.map((seg: any, i: number) =>
@@ -78,29 +85,26 @@ function LabeledText({ text }: { text: string }) {
   );
 }
 
-// 【修復核心 1】輔助函數：將從 Google Sheets 來的圖片字串安全轉換為陣列
+// 【修復 3】將從 Google Sheets 來的圖片字串安全轉換為陣列，修復 e.map is not a function 錯誤
 const parseImages = (imgData: any) => {
-  if (!imgData) return;
+  if (!imgData) return new Array();
   if (Array.isArray(imgData)) return imgData;
-  if (typeof imgData === 'string') return imgData.split(',').map(s => s.trim()).filter(Boolean);
-  return;
+  if (typeof imgData === 'string') return imgData.split(',').map((s: string) => s.trim()).filter(Boolean);
+  return new Array();
 };
 
-// 【修復核心 2】輔助函數：保證回傳的一定是陣列
-const safeArray = (data: any) => (Array.isArray(data)? data :);
+const safeArray = (data: any) => (Array.isArray(data)? data : new Array());
 
 export default async function ProjectDetailPage({ params }: PageProps) {
+  const { slug } = await params;
   const data = await fetchPortfolioData();
-  const project = data?.Dynamic?.find((p: any) => slugify(p.project_name) === params.slug);
-  const profile = data?.Static?. |
-
-| {};
+  const project = data?.Dynamic? data.Dynamic.find((p: any) => slugify(p.project_name) === slug) : null;
+  const profile = data?.Static?.at(0)? data.Static.at(0) : {};
 
   if (!project) {
     notFound();
   }
 
-  // 安全解析所有陣列，避免 undefined 引發.map 錯誤
   const tags = safeArray(getProjectTags(project));
   const industries = safeArray(getProjectIndustries(project));
   const phases = safeArray(getProjectPhases(project));
@@ -112,33 +116,28 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const hasSituation =!isPlaceholder(project.situation);
   const hasTask =!isPlaceholder(project.task);
   const hasResult =!isPlaceholder(project.result);
-  const hasActions = actions.length > 0 && actions!== '';
-  const hasImpacts = impacts.length > 0 && impacts!== '';
-  const hasAnyContent = hasSituation |
-
-| hasTask |
-| hasActions |
-| hasImpacts |
-| hasResult;
+  const hasActions = actions.length > 0? (actions.at(0)!== ''? true : false) : false;
+  const hasImpacts = impacts.length > 0? (impacts.at(0)!== ''? true : false) : false;
   
-  const { prev, next } = getAdjacentProjects(data.Dynamic ||, params.slug);
+  const contentCheck = new Array(hasSituation, hasTask, hasActions, hasImpacts, hasResult);
+  const hasAnyContent = contentCheck.some(Boolean);
+  
+  const dynamicData = data?.Dynamic? data.Dynamic : new Array();
+  const { prev, next } = getAdjacentProjects(dynamicData, slug);
 
-  // 統一處理圖片欄位，從字串轉為陣列
   const imgProject = parseImages(project.img_project);
   const imgSituation = parseImages(project.img_situation);
   const imgTask = parseImages(project.img_task);
   const imgActions = parseImages(project.img_actions);
   const imgResult = parseImages(project.img_result);
-  const imgImpact = parseImages(project.img_impact);
 
-  const hasProjectCover = imgProject.length > 0;
+  const hasProjectCover = imgProject.length > 0? true : false;
 
   return (
     <div className="min-h-screen bg-background">
       <Nav />
 
       <main className="pt-20 pb-16">
-        {/* Full-width header */}
         <div className="border-b border-border/30">
           <div className="max-w-6xl mx-auto px-6 pt-10 pb-12">
             <a
@@ -178,7 +177,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Metadata bar */}
         <div className="border-b border-border/30 bg-surface/50">
           <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px]">
             <div className="flex items-center gap-2">
@@ -191,7 +189,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               <span className="text-muted-foreground">Industry</span>
               <span className="font-medium">{project.industry}</span>
             </div>
-            {phases.length > 0 && (
+            {phases.length > 0? (
               <div className="flex items-center gap-2">
                 <Layers className="w-3.5 h-3.5 text-accent/60" />
                 <span className="text-muted-foreground">Phase</span>
@@ -206,7 +204,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   ))}
                 </div>
               </div>
-            )}
+            ) : null}
             <div className="flex items-center gap-2">
               <Briefcase className="w-3.5 h-3.5 text-accent/60" />
               <span className="text-muted-foreground">Role</span>
@@ -220,13 +218,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Content area: main + sidebar */}
         <div className="max-w-6xl mx-auto px-6 py-12">
           
           {hasProjectCover? (
             <div className="mb-12 rounded-xl overflow-hidden bg-surface/10 flex items-center justify-center border border-border/20">
               <img
-                src={imgProject}
+                src={imgProject.at(0)}
                 alt={`${project.project_name} cover`}
                 className="w-full h-auto max-h-[60vh] object-contain"
               />
@@ -245,11 +242,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </div>
           )}
 
-          {hasAnyContent && (
+          {hasAnyContent? (
             <div className="grid lg:grid-cols-[1.4fr_1fr] gap-12">
-              {/* Left: Main narrative */}
               <div>
-                {hasSituation && (
+                {hasSituation? (
                   <section className="mb-10">
                     <SectionHeader number="01" label="Situation" />
                     <p className="text-[15px] leading-[1.8] text-foreground/80">
@@ -260,9 +256,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       altPrefix={`${project.project_name} Situation`} 
                     />
                   </section>
-                )}
+                ) : null}
 
-                {hasTask && (
+                {hasTask? (
                   <section className="mb-10">
                     <SectionHeader number="02" label="Task" />
                     <p className="text-[15px] leading-[1.8] text-foreground/80">
@@ -273,9 +269,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       altPrefix={`${project.project_name} Task`} 
                     />
                   </section>
-                )}
+                ) : null}
 
-                {hasActions && (
+                {hasActions? (
                   <section className="mb-10">
                     <SectionHeader number="03" label="Roles & Deliverables" />
                     <div className="space-y-4">
@@ -290,15 +286,14 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                         </div>
                       ))}
                     </div>
-                    {/* Render dynamic Actions images */}
                     <SectionImages 
                       images={imgActions} 
                       altPrefix={`${project.project_name} Actions`} 
                     />
                   </section>
-                )}
+                ) : null}
 
-                {hasResult && (
+                {hasResult? (
                   <section className="mb-10">
                     <SectionHeader number="04" label="Result" />
                     <div className="space-y-4">
@@ -313,12 +308,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       altPrefix={`${project.project_name} Result`} 
                     />
                   </section>
-                )}
+                ) : null}
               </div>
 
-              {/* Right: Sidebar */}
               <div className="space-y-6">
-                {hasImpacts && (
+                {hasImpacts? (
                   <div className="glass rounded-xl p-5">
                     <p className="text-[12px] font-semibold tracking-[0.15em] uppercase text-accent mb-4">
                       Impact
@@ -339,7 +333,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       ))}
                     </div>
                   </div>
-                )}
+                ) : null}
 
                 <div className="glass rounded-xl p-5">
                   <p className="text-[12px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mb-4">
@@ -355,7 +349,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       <span className="text-muted-foreground">Industry</span>
                       <span className="font-medium">{project.industry}</span>
                     </div>
-                    {phases.length > 0 && (
+                    {phases.length > 0? (
                       <>
                         <div className="h-px bg-border/40" />
                         <div>
@@ -372,7 +366,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                           </div>
                         </div>
                       </>
-                    )}
+                    ) : null}
                     <div className="h-px bg-border/40" />
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Role</span>
@@ -387,10 +381,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
 
-        {/* Previous / Next navigation */}
         <div className="border-t border-border/30">
           <div className="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
             {prev? (
@@ -427,7 +420,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         </div>
       </main>
 
-      <CTASection profile={profile} projects={data?.Dynamic ||} />
+      <CTASection profile={profile} projects={dynamicData} />
       <Footer profile={profile} />
     </div>
   );
