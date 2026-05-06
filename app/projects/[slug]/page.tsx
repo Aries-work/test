@@ -1,14 +1,6 @@
-import { fetchPortfolioData } from '@/lib/data';
+import { DEFAULT_PROFILE, fetchPortfolioData } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import {
-  ArrowLeft,
-  ArrowRight,
-  Briefcase,
-  Calendar,
-  Building2,
-  Globe,
-  Layers,
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { CTASection } from '@/components/cta-section';
 import { Footer } from '@/components/footer';
 import { Nav } from '@/components/nav';
@@ -19,28 +11,26 @@ import {
   isPlaceholder,
   getProjectSubtitle,
   slugify,
-  getProjectTags,
-  getProjectIndustries,
-  getProjectPhases,
   getAdjacentProjects,
 } from '@/lib/utils';
+import type { Project } from '@/lib/types';
 import type { Metadata } from 'next';
 
 type PageProps = {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 };
 
 // -------------------------
 // Metadata
 // -------------------------
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug } = params;
   const data = await fetchPortfolioData();
 
   const projects = Array.isArray(data?.Dynamic) ? data.Dynamic : [];
 
   const project = projects.find(
-    (p: any) => slugify(p?.project_name ?? '') === slug
+    (p) => slugify(p?.project_name ?? '') === slug
   );
 
   if (!project) return { title: 'Project Not Found' };
@@ -64,21 +54,23 @@ export async function generateStaticParams() {
   const data = await fetchPortfolioData();
   const projects = Array.isArray(data?.Dynamic) ? data.Dynamic : [];
 
-  return projects.map((p: any) => ({
-    slug: slugify(p?.project_name ?? ''),
-  }));
+  return projects
+    .map((p) => ({
+      slug: slugify(p?.project_name ?? ''),
+    }))
+    .filter(({ slug }) => slug);
 }
 
 // -------------------------
 // Helpers
 // -------------------------
-function safeArray(input: any): any[] {
+function safeArray<T>(input: T[]): T[] {
   return Array.isArray(input) ? input : [];
 }
 
-const parseImages = (img: any): string[] => {
+const parseImages = (img?: string | string[]): string[] => {
   if (!img) return [];
-  if (Array.isArray(img)) return img;
+  if (Array.isArray(img)) return img.filter(Boolean);
   if (typeof img === 'string') {
     return img
       .split(',')
@@ -109,7 +101,7 @@ function LabeledText({ text }: { text: string }) {
 
   return (
     <>
-      {segments.map((seg: any, i: number) =>
+      {segments.map((seg, i) =>
         seg.bold ? (
           <strong key={i} className="font-semibold">
             {seg.text}
@@ -126,32 +118,30 @@ function LabeledText({ text }: { text: string }) {
 // Page
 // -------------------------
 export default async function ProjectDetailPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { slug } = params;
 
   const data = await fetchPortfolioData();
 
   const projects = Array.isArray(data?.Dynamic) ? data.Dynamic : [];
-  const profile = data?.Static?.[0] ?? {};
+  const profile = data?.Static?.[0] ?? DEFAULT_PROFILE;
 
   const project = projects.find(
-    (p: any) => slugify(p?.project_name ?? '') === slug
+    (p) => slugify(p?.project_name ?? '') === slug
   );
 
   if (!project) notFound();
 
-  const tags = safeArray(getProjectTags(project));
-  const industries = safeArray(getProjectIndustries(project));
-  const phases = safeArray(getProjectPhases(project));
+  const currentProject = project as Project;
 
-  const actions = safeArray(parseQuotedList(project.actions));
-  const impacts = safeArray(parseQuotedList(project.impact));
-  const results = safeArray(parseQuotedList(project.result));
+  const actions = safeArray(parseQuotedList(currentProject.actions));
+  const impacts = safeArray(parseQuotedList(currentProject.impact));
+  const results = safeArray(parseQuotedList(currentProject.result));
 
-  const subtitle = getProjectSubtitle(project);
+  const subtitle = getProjectSubtitle(currentProject);
 
-  const hasSituation = !isPlaceholder(project.situation);
-  const hasTask = !isPlaceholder(project.task);
-  const hasResult = !isPlaceholder(project.result);
+  const hasSituation = !isPlaceholder(currentProject.situation);
+  const hasTask = !isPlaceholder(currentProject.task);
+  const hasResult = !isPlaceholder(currentProject.result);
 
   const hasActions = actions.length > 0 && actions[0] !== '';
   const hasImpacts = impacts.length > 0 && impacts[0] !== '';
@@ -166,11 +156,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   const { prev, next } = getAdjacentProjects(projects, slug);
 
-  const imgProject = parseImages(project.img_project);
-  const imgSituation = parseImages(project.img_situation);
-  const imgTask = parseImages(project.img_task);
-  const imgActions = parseImages(project.img_actions);
-  const imgResult = parseImages(project.img_result);
+  const imgProject = parseImages(currentProject.img_project);
+  const imgSituation = parseImages(currentProject.img_situation);
+  const imgTask = parseImages(currentProject.img_task);
+  const imgActions = parseImages(currentProject.img_actions);
+  const imgResult = parseImages(currentProject.img_result);
 
   const hasProjectCover = imgProject.length > 0;
 
@@ -191,7 +181,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </a>
 
             <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl mt-6 mb-4">
-              {project.project_name}
+              {currentProject.project_name}
             </h1>
 
             <p className="text-muted-foreground max-w-2xl">
@@ -210,7 +200,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             <img
               src={imgProject[0]}
               className="rounded-xl mb-12"
-              alt="cover"
+              alt={`${currentProject.project_name} cover`}
             />
           )}
 
@@ -224,16 +214,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 {hasSituation && (
                   <section>
                     <SectionHeader number="01" label="Situation" />
-                    <p>{project.situation}</p>
-                    <SectionImages images={imgSituation} />
+                    <p>{currentProject.situation}</p>
+                    <SectionImages images={imgSituation} altPrefix={`${currentProject.project_name} situation`} />
                   </section>
                 )}
 
                 {hasTask && (
                   <section>
                     <SectionHeader number="02" label="Task" />
-                    <p>{project.task}</p>
-                    <SectionImages images={imgTask} />
+                    <p>{currentProject.task}</p>
+                    <SectionImages images={imgTask} altPrefix={`${currentProject.project_name} task`} />
                   </section>
                 )}
 
@@ -245,7 +235,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                         <LabeledText text={a} />
                       </p>
                     ))}
-                    <SectionImages images={imgActions} />
+                    <SectionImages images={imgActions} altPrefix={`${currentProject.project_name} action`} />
                   </section>
                 )}
 
@@ -257,7 +247,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                         <LabeledText text={r} />
                       </p>
                     ))}
-                    <SectionImages images={imgResult} />
+                    <SectionImages images={imgResult} altPrefix={`${currentProject.project_name} result`} />
                   </section>
                 )}
               </div>

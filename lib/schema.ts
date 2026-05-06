@@ -1,30 +1,58 @@
 import { z } from "zod";
 
+const stringWithDefault = (defaultValue = "") =>
+  z.preprocess(
+    (value) => (value === null || value === undefined ? undefined : value),
+    z.coerce.string().optional().default(defaultValue)
+  );
+
+const ImageListSchema = z.preprocess((value) => {
+  if (value === null || value === undefined || value === "") return [];
+  if (Array.isArray(value)) return value;
+
+  return String(value)
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}, z.array(z.string()).default([]));
+
 /* -----------------------------
    Project Schema (CORE FIXED)
 ------------------------------ */
 
 export const ProjectSchema = z.object({
-  project_name: z.coerce.string().optional().default("Untitled Project"),
-  company: z.coerce.string().optional().default("Unknown"),
-  industry: z.coerce.string().optional().default(""),
-  role: z.coerce.string().optional().default(""),
-  date: z.coerce.string().optional().default(""),
+  project_name: stringWithDefault("Untitled Project"),
+  company: stringWithDefault("Unknown"),
+  industry: stringWithDefault(),
+  role: stringWithDefault(),
+  date: stringWithDefault(),
 
-  short_description: z.coerce.string().optional().nullable(),
+  short_description: stringWithDefault(),
 
-  situation: z.coerce.string().optional().nullable(),
-  task: z.coerce.string().optional().nullable(),
-  result: z.coerce.string().optional().nullable(),
+  situation: stringWithDefault(),
+  task: stringWithDefault(),
+  actions: stringWithDefault(),
+  impact: stringWithDefault(),
+  result: stringWithDefault(),
 
-  Tags: z.coerce.string().optional().nullable(),
-  phase: z.coerce.string().optional().nullable(),
+  Tags: stringWithDefault(),
+  phase: stringWithDefault(),
 
-  img_project: z.union([z.string(), z.array(z.string())]).optional(),
-  img_situation: z.union([z.string(), z.array(z.string())]).optional(),
-  img_task: z.union([z.string(), z.array(z.string())]).optional(),
-  img_actions: z.union([z.string(), z.array(z.string())]).optional(),
-  img_result: z.union([z.string(), z.array(z.string())]).optional(),
+  img_project: ImageListSchema,
+  img_situation: ImageListSchema,
+  img_task: ImageListSchema,
+  img_actions: ImageListSchema,
+  img_impact: ImageListSchema,
+  img_result: ImageListSchema,
+});
+
+export const ProfileSchema = z.object({
+  name: stringWithDefault("Aries Liu"),
+  headline: stringWithDefault("I Build the [Right] Thing, then [Scale It]."),
+  titles: stringWithDefault("Product Owner, Project Lead, AI Builder"),
+  summary: stringWithDefault("Product Leader (8 yrs Product, 4+ yrs Leadership) across FinTech, Gaming, MarTech, and Healthcare."),
+  contact_email: stringWithDefault("ariesccliu@gmail.com"),
+  linkedin_url: stringWithDefault("linkedin.com/in/ariesliu"),
 });
 
 /* -----------------------------
@@ -33,7 +61,7 @@ export const ProjectSchema = z.object({
 
 export const PortfolioSchema = z.object({
   Dynamic: z.array(ProjectSchema).optional().default([]),
-  Static: z.array(z.any()).optional().default([]),
+  Static: z.array(ProfileSchema).optional().default([]),
 });
 
 /* -----------------------------
